@@ -2,7 +2,7 @@
 package main
 
 import (
-	"encoding/json"
+	"github.com/swamp-labs/swamp/server/api"
 	"log"
 	"net/http"
 
@@ -14,50 +14,14 @@ type App struct {
 	Router *mux.Router
 }
 
-func createJobHandler(w http.ResponseWriter, r *http.Request) {
-	var response map[string]interface{}
-	json.Unmarshal([]byte(`{ "function": "createJobHandler" }`), &response)
-	respondWithJSON(w, http.StatusOK, response)
-}
-
-func getJobHandler(w http.ResponseWriter, r *http.Request) {
-	var response map[string]interface{}
-	json.Unmarshal([]byte(`{ "function": "getJobHandler" }`), &response)
-	respondWithJSON(w, http.StatusOK, response)
-}
-
-func deleteJobHandler(w http.ResponseWriter, r *http.Request) {
-	var response map[string]interface{}
-	json.Unmarshal([]byte(`{ "function": "deleteJobHandler" }`), &response)
-	respondWithJSON(w, http.StatusOK, response)
-}
-
-func listJobsHandler(w http.ResponseWriter, r *http.Request) {
-	var response map[string]interface{}
-	json.Unmarshal([]byte(`{ "function": "listJobsHandler" }`), &response)
-	respondWithJSON(w, http.StatusOK, response)
-}
-
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	var response map[string]interface{}
-	json.Unmarshal([]byte(`{ "function": "healthHandler" }`), &response)
-	respondWithJSON(w, http.StatusOK, response)
-}
-
-func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(payload)
-}
-
 func (app *App) initialiseRoutes() {
 	app.Router = mux.NewRouter()
 	s := app.Router.PathPrefix("/api").Subrouter()
-	s.HandleFunc("/v0/job", createJobHandler).Methods("POST")
-	s.HandleFunc("/v0/job/{id:[0-9]+}", getJobHandler).Methods("GET")
-	s.HandleFunc("/v0/job/{id:[0-9]+}", deleteJobHandler).Methods("DELETE")
-	s.HandleFunc("/v0/jobs", listJobsHandler).Methods("GET")
-	s.HandleFunc("/v0/health", healthHandler).Methods("GET")
+	s.HandleFunc("/v0/jobs", api.JsonHandler(createJob)).Methods("POST")
+	s.HandleFunc("/v0/jobs/{id:[0-9]+}", api.JsonHandler(getJob)).Methods("GET")
+	s.HandleFunc("/v0/jobs/{id:[0-9]+}", api.JsonHandler(deleteJob)).Methods("DELETE")
+	s.HandleFunc("/v0/jobs", api.JsonHandler(listJobs)).Methods("GET")
+	s.HandleFunc("/v0/health", api.JsonHandler(health)).Methods("GET")
 }
 
 func (app *App) run() {
