@@ -1,0 +1,22 @@
+
+groups:
+- requests:
+  - name: "req1"
+    verb: "GET"
+    url: "localhost:8080"
+    body: "param1=toto"
+    parameters: ["param1","param2"]
+    assertions: ["status=200"]
+    save_val: ["$.id"]
+  - name: req2
+    verb: POST
+    url: "localhost:8080"
+    body: "param1=toto"
+    assertions:
+    - "status: 200"
+    save_val: 
+    - "$.id"
+
+volumes:
+- request_group: 1
+  execution: ["wait(5)","rps(5)during(60s)"]
