@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 
+	"github.com/swamp-labs/swamp/engine/httpreq"
 	"gopkg.in/yaml.v2"
 )
 
@@ -15,18 +16,7 @@ type Simulation struct {
 
 // Group defines a list of requests
 type Group struct {
-	Requests []Request `yaml:"requests"`
-}
-
-// Request struct defines all parameters for http requests to execute
-type Request struct {
-	Name       string   `yaml:"name"`
-	Verb       string   `yaml:"verb"`
-	URL        string   `yaml:"URL"`
-	Body       string   `yaml:"body"`
-	Parameters []string `yaml:"parameters"`
-	Assertions []string `yaml:"assertions"`
-	SaveVal    []string `yaml:"save_val"`
+	Requests []httpreq.Request `yaml:"requests"`
 }
 
 // Volume defines an execution plan.
