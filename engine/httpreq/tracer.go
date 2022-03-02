@@ -2,7 +2,6 @@ package httpreq
 
 import (
 	"crypto/tls"
-	"log"
 	"net"
 	"net/http/httptrace"
 	"sync/atomic"
@@ -60,9 +59,7 @@ func (t *Trace) Trace() *httptrace.ClientTrace {
 		WroteRequest:         t.WroteRequest,
 		GotFirstResponseByte: t.GotFirstResponseByte,
 		DNSStart:             t.DNSStart,
-
-		// DNSDone is called when a DNS lookup ends.
-		DNSDone: t.DNSDone,
+		DNSDone:              t.DNSDone,
 	}
 }
 
@@ -75,7 +72,6 @@ func now() int64 {
 // "host:port" of the target or proxy. GetConn is called even
 // if there's already an idle cached connection available.
 func (t *Trace) GetConn(hostPort string) {
-	log.Println("GetConn: ", now())
 	t.getConn = now()
 }
 
@@ -94,10 +90,22 @@ func (t *Trace) ConnectStart(network, addr string) {
 // connection; instead, use the error from
 // Transport.RoundTrip.
 func (t *Trace) GotConn(info httptrace.GotConnInfo) {
-	log.Println("GotConn: ", now())
 	t.gotConn = now()
 	t.connReused = info.Reused
 	t.connRemoteAddr = info.Conn.RemoteAddr()
+	_, isTLS := info.Conn.(*tls.Conn)
+
+	// If connection is reused we need to attribute a value
+	// for connection attribute & tlsHandshake
+	if info.Reused {
+		atomic.SwapInt64(&t.connectStart, now())
+		atomic.SwapInt64(&t.connectDone, now())
+		if isTLS {
+			atomic.SwapInt64(&t.tlsHandshakeStart, now())
+			atomic.SwapInt64(&t.tlsHandshakeDone, now())
+		}
+	}
+
 }
 
 // ConnectDone is called when a new connection's Dial
@@ -111,11 +119,12 @@ func (t *Trace) ConnectDone(network, addr string, err error) {
 	}
 }
 
+// DNSStart is called when a DNS lookup begins.
 func (t *Trace) DNSStart(dns httptrace.DNSStartInfo) {
-	log.Println(dns.Host)
 	t.dnsStart = now()
 }
 
+// DNSDone is called when a DNS lookup ends.
 func (t *Trace) DNSDone(httptrace.DNSDoneInfo) {
 	t.dnsDone = now()
 }
@@ -124,7 +133,7 @@ func (t *Trace) DNSDone(httptrace.DNSDoneInfo) {
 // connecting to an HTTPS site via an HTTP proxy, the handshake happens
 // after the CONNECT request is processed by the proxy.
 func (t *Trace) TLSHandshakeStart() {
-	t.tlsHandshakeStart = now()
+	atomic.CompareAndSwapInt64(&t.tlsHandshakeStart, 0, now())
 }
 
 // TLSHandshakeDone is called after the TLS handshake with either the
@@ -132,15 +141,17 @@ func (t *Trace) TLSHandshakeStart() {
 // failure.
 func (t *Trace) TLSHandshakeDone(state tls.ConnectionState, err error) {
 	if err == nil {
-		t.tlsHandshakeDone = now()
+		atomic.CompareAndSwapInt64(&t.tlsHandshakeDone, 0, now())
 	}
 }
 
 // WroteRequest is called with the result of writing the
 // request and any body. It may be called multiple times
 // in the case of retried requests.
-func (t *Trace) WroteRequest(httptrace.WroteRequestInfo) {
-	atomic.CompareAndSwapInt64(&t.wroteRequest, 0, now())
+func (t *Trace) WroteRequest(info httptrace.WroteRequestInfo) {
+	if info.Err == nil {
+		t.wroteRequest = now()
+	}
 }
 
 // GotFirstResponseByte is called when the first byte of the response
@@ -174,9 +185,11 @@ func (t *Trace) Done() *Sample {
 			// If the request was sent over TLS, we need to use
 			// TLS Handshake Done time to calculate sending duration
 			s.Sending = time.Duration(t.wroteRequest - t.tlsHandshakeDone)
+
 		} else if t.connectDone != 0 {
 			// Otherwise, use the end of the normal connection
 			s.Sending = time.Duration(t.wroteRequest - t.connectDone)
+
 		} else {
 			// Finally, this handles the strange HTTP/2 case where the GotConn() hook
 			// gets called first, but with Reused=false

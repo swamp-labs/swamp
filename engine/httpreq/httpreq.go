@@ -1,7 +1,6 @@
 package httpreq
 
 import (
-	"log"
 	"net/http"
 	"net/http/httptrace"
 )
@@ -19,11 +18,6 @@ type Request struct {
 type assertion struct{} //TO DO
 
 type saveValue struct{} //TO DO
-
-// func (r *Request) InitQueryParam() *Request {
-// 	r.QueryParameters = make(map[string]string)
-// 	return r
-// }
 
 // AddQueryParam func is called to add query parameters to the http request
 func (r *Request) AddQueryParam(key string, value string) *Request {
@@ -52,23 +46,8 @@ func (r *Request) Execute() error {
 		return err
 	}
 	defer resp.Body.Close()
-	if err != nil {
-		return err
-	}
 
-	sample := clientTrace.Done()
-	log.Println("######### SAMPLE #########")
-	log.Println("EndTime: ", sample.EndTime)
-	log.Println("ConnDuration: ", sample.ConnDuration)
-	log.Println("ReqDuration: ", sample.ReqDuration)
-	log.Println("WaitingConn: ", sample.WaitingConn)
-	log.Println("Connecting: ", sample.Connecting)
-	log.Println("TLSHandshaking: ", sample.TLSHandshaking)
-	log.Println("Sending: ", sample.Sending)
-	log.Println("WaitingResp: ", sample.WaitingResp)
-	log.Println("Receiving: ", sample.Receiving)
-	log.Println("ConnReused: ", sample.ConnReused)
-	log.Println("ConnRemoteAddr: ", sample.ConnRemoteAddr)
+	clientTrace.Done()
 
 	return nil
 }
