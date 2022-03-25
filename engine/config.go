@@ -10,19 +10,14 @@ import (
 
 // Simulation wraps configuration file content
 type Simulation struct {
-	Groups  []Group  `yaml:"groups"`
-	Volumes []Volume `yaml:"volumes"`
-}
-
-// Group defines a list of requests
-type Group struct {
-	Requests []httpreq.Request `yaml:"requests"`
+	Simulation map[string][]httpreq.Request
+	Volumes    []Volume `yaml:"volumes"`
 }
 
 // Volume defines an execution plan.
 type Volume struct {
-	RequestGroup int      `yaml:"request_group"`
-	Execution    []string `yaml:"execution"`
+	RequestGroup int `yaml:"request_group"`
+	//	Execution    []string `yaml:"execution"`
 }
 
 // ConfigReader read a YAML configuration file to extract a simulation.
