@@ -1,0 +1,60 @@
+# globals:
+#   headers:
+#     h1: 
+#     - Content-Type: "application/json"
+#     h2:
+#     - Accept: "*/*"
+#   assertions:
+#     check1:
+#     - status: 200
+x-headers: &headers
+    headers:
+    - Content-Type: "application/json"
+    - Accept: "*/*"
+
+
+simulation:
+  g1: 
+  - name: req1
+    verb: "POST"
+    protocol: https
+    url: https://reqres.in/api/users
+    <<: *headers
+    body: '{ "name": "batman", "job": "superhero"}'
+    assertions:
+  #     headers:
+  #     - Access-Control-Allow-Origin: *
+      body:      
+      - kind: jsonpath
+        exp: $.id
+        variable: id
+      - kind: regex
+  #      exp: '\"(?P<id>\d{1,3})\"'
+        exp: '(\d{1,3})'
+      code:
+        - 200
+
+  - name: req2
+    verb: GET
+    url: https://reqres.in/api/users/${id}
+    <<: *headers
+    assertions:
+    - kind: jsonpath
+      exp: $.id
+      variable: id
+  # g2: 
+  # - name: req3
+  #   verb: POST
+  #   url: https://reqres.in/api/users
+  #   body: "{\"name\": \"morpheus\",\"job\": \"leader\"}"
+  #   assertions:
+  #   - target: status
+  #     values: [201, 201]
+
+volumes:
+ - request_group: g1
+#   execution: 
+#   - wait: 5
+#   - rps: 5
+#     during: 60s
+#   - increase:

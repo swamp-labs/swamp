@@ -1,23 +1,29 @@
 package httpreq
 
 import (
+	"log"
 	"net/http"
 	"net/http/httptrace"
+
+	as "github.com/swamp-labs/swamp/engine/assertion"
 )
 
-// Request defines an http request
+// type QueryParameter struct {
+// 	Key   string `yaml:"key"`
+// 	Value string `yaml:"value"`
+// }
+
+// Request struct defines all parameters for http requests to execute
 type Request struct {
-	Method          string
-	URL             string
-	QueryParameters map[string]string
-	Assertions      []assertion
-	SaveValues      []saveValue
-	Name            string
+	Name            string              `yaml:"name"`
+	Verb            string              `yaml:"verb"`
+	Protocol        string              `yaml:"protocol"`
+	Headers         []map[string]string `yaml:"headers"`
+	URL             string              `yaml:"url"`
+	Body            string              `yaml:"body"`
+	QueryParameters map[string]string   `yaml:"query_parameters"`
+	Assertions      as.Assertion        `yaml:"assertions"`
 }
-
-type assertion struct{} //TO DO
-
-type saveValue struct{} //TO DO
 
 // AddQueryParam func is called to add query parameters to the http request
 func (r *Request) AddQueryParam(key string, value string) *Request {
@@ -26,11 +32,19 @@ func (r *Request) AddQueryParam(key string, value string) *Request {
 }
 
 // Execute generate send the http request using client trace
-func (r *Request) Execute() error {
+func (r *Request) Execute() (map[string]string, error) {
 	client := &http.Client{}
 	clientTrace := Trace{}
-	req, _ := http.NewRequest(r.Method, r.URL, nil)
+	req, _ := http.NewRequest(r.Verb, r.URL, nil)
 
+	if r.Headers != nil {
+		for i := range r.Headers {
+			for key := range r.Headers[i] {
+				log.Println("key", key, "value", r.Headers[i][key])
+				req.Header.Set(key, r.Headers[i][key])
+			}
+		}
+	}
 	q := req.URL.Query()
 	if len(r.QueryParameters) > 0 {
 		for key, value := range r.QueryParameters {
@@ -43,11 +57,15 @@ func (r *Request) Execute() error {
 	req.URL.RawQuery = q.Encode()
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer resp.Body.Close()
-
 	clientTrace.Done()
+	_, variables, err := as.AssertResponse(r.Assertions, resp)
+	if err != nil {
+		return nil, err
+	}
+	log.Println(resp.Header)
 
-	return nil
+	return variables, nil
 }
