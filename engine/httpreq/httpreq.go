@@ -1,7 +1,6 @@
 package httpreq
 
 import (
-	"log"
 	"net/http"
 	"net/http/httptrace"
 
@@ -32,19 +31,10 @@ func (r *Request) AddQueryParam(key string, value string) *Request {
 }
 
 // Execute generate send the http request using client trace
-func (r *Request) Execute() (map[string]string, error) {
+func (r *Request) Execute(m map[string]string) (bool, error) {
 	client := &http.Client{}
 	clientTrace := Trace{}
 	req, _ := http.NewRequest(r.Verb, r.URL, nil)
-
-	if r.Headers != nil {
-		for i := range r.Headers {
-			for key := range r.Headers[i] {
-				log.Println("key", key, "value", r.Headers[i][key])
-				req.Header.Set(key, r.Headers[i][key])
-			}
-		}
-	}
 	q := req.URL.Query()
 	if len(r.QueryParameters) > 0 {
 		for key, value := range r.QueryParameters {
@@ -57,15 +47,15 @@ func (r *Request) Execute() (map[string]string, error) {
 	req.URL.RawQuery = q.Encode()
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 	defer resp.Body.Close()
 	clientTrace.Done()
-	_, variables, err := as.AssertResponse(r.Assertions, resp)
-	if err != nil {
-		return nil, err
-	}
-	log.Println(resp.Header)
 
-	return variables, nil
+	v, err := as.AssertResponse(r.Assertions, resp, m)
+	if err != nil {
+		return false, err
+	}
+
+	return v, nil
 }

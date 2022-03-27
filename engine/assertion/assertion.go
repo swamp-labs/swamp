@@ -3,14 +3,13 @@ package assertion
 import (
 	"errors"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
 type Assertion struct {
 	Body    []bodyAssertion
 	Code    []int
-	Headers []map[string]string
+	Headers []map[string][]string
 }
 
 // Assertion defines a check to execute against response
@@ -29,42 +28,51 @@ const (
 	jsonPath Kind = "jsonpath"
 )
 
-func AssertResponse(as Assertion, resp *http.Response) (valid bool, variables map[string]string, err error) {
-	variables = make(map[string]string)
-	var validCode bool
+func AssertResponse(a Assertion, resp *http.Response, m map[string]string) (valid bool, err error) {
 	validBody := true
-	validHeaders := true
+
+	validCode := a.validateCodeStatus(resp.StatusCode)
+	validHeaders := a.validateHeaders(&resp.Header)
 	if resp.ContentLength > 0 {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return false, nil, err
+			return false, err
 		}
-		if as.Code == nil {
-			if resp.StatusCode > 199 && resp.StatusCode < 299 {
-				validCode = true
-			}
-		} else {
-			for _, code := range as.Code {
-				if resp.StatusCode == code {
-					validCode = true
-				}
-			}
-		}
-		if as.Body != nil {
-			for _, ba := range as.Body {
-				v, _, _ := ba.validateBody(body, variables)
+
+		if a.Body != nil {
+			for _, ba := range a.Body {
+				v, _, _ := ba.validateBody(body, m)
 				if !v {
 					validBody = false
 				}
 			}
 		}
 	}
-	log.Println("variables:", variables)
 	validResp := validCode && validBody && validHeaders
-	return validResp, nil, nil
+	return validResp, nil
 }
 
-// validateBody assert body
+// validateCodeStatus verify if the returned http code
+// matchs with at least one value provided by user
+// In case user did not provide any code, we check code is 2XX
+func (a *Assertion) validateCodeStatus(statusCode int) bool {
+
+	if a.Code == nil {
+		if statusCode > 199 && statusCode < 300 {
+			return true
+		}
+	} else {
+		for _, code := range a.Code {
+			if code == statusCode {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// validateBody verify if body matchs with the expression given
+// in assertions.Body, it can be regex, jsonPath (or other in the future)
 func (ba *bodyAssertion) validateBody(raw []byte, m map[string]string) (bool, map[string]string, error) {
 
 	switch ba.Kind {
@@ -93,7 +101,35 @@ func (ba *bodyAssertion) validateBody(raw []byte, m map[string]string) (bool, ma
 		}
 		return matched, m, nil
 	}
-	return false, nil, errors.New("no assertion kind found")
+	return false, nil, errors.New("error: no assertion kind found")
 }
 
-func validateHeaders() {}
+// validateHeaders verify for each key []values inserted by user if
+// the all the values exists for the associated key.
+// Example : - Access-Control-Allow-Origin: ["*"]
+// The function will find if the header exists with the associated value.
+func (a *Assertion) validateHeaders(headers *http.Header) bool {
+	valid := true
+	// loop over table of maps in Assertion.Headers
+	for _, m := range a.Headers {
+		// loop over each map
+		for key, values := range m {
+			// loop over the assertions values to execute contains function
+			for _, value := range values {
+				// We use the AND operation (&&). This way if a value define in assertion
+				// is not present, the request is considered not valid
+				valid = valid && contains(headers.Values(key), value)
+			}
+		}
+	}
+	return valid
+}
+
+func contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+	return false
+}
