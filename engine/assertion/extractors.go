@@ -38,7 +38,7 @@ func validateWithRegex(raw []byte, exp string) (bool, error) {
 
 // getFromJsonPath reads a path from a decoded JSON array
 // and returns the corresponding value or an error.
-// also returns a boolean to indicate if a match has been found
+// Also returns a boolean that indicates if a match has been found
 func getFromJsonPath(raw []byte, exp string) (bool, string, error) {
 	var body interface{}
 	err := json.Unmarshal(raw, &body)

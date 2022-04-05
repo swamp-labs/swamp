@@ -69,7 +69,7 @@ func (a *Assertion) validateCodeStatus(statusCode int) bool {
 	return false
 }
 
-// validateBody verify if body matchs with the expression given
+// validateBody verify if body match with the expression given
 // in assertions.Body, it can be regex, jsonPath (or other in the future)
 func (a *Assertion) validateBody(raw []byte, m map[string]string) (bool, error) {
 	valid := true
@@ -98,6 +98,7 @@ func (a *Assertion) validateBody(raw []byte, m map[string]string) (bool, error) 
 			}
 			valid = valid && matched
 		}
+
 	}
 	return valid, nil
 }

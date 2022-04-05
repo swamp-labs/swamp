@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestValidateWithRegex_True(t *testing.T) {
+func TestValidateWithRegexTrue(t *testing.T) {
 	raw := []byte(`{"id":"123"}`)
 
 	boolean, err := validateWithRegex(raw, "(\\d{1,3})")
@@ -17,7 +17,7 @@ func TestValidateWithRegex_True(t *testing.T) {
 	}
 }
 
-func TestValidateWithRegex_False(t *testing.T) {
+func TestValidateWithRegexFalse(t *testing.T) {
 	raw := []byte(`{"message":"Hello World"}`)
 
 	boolean, err := validateWithRegex(raw, "(\\d{1,3})")
@@ -30,7 +30,7 @@ func TestValidateWithRegex_False(t *testing.T) {
 	}
 }
 
-func TestGetFromRegex_EmptyExp(t *testing.T) {
+func TestGetFromRegexEmptyExp(t *testing.T) {
 	raw := []byte(`{"id":"123"}`)
 
 	result, _ := getFromRegex(raw, "")
@@ -40,7 +40,7 @@ func TestGetFromRegex_EmptyExp(t *testing.T) {
 	}
 }
 
-func TestGetFromRegex_NoSubMatch(t *testing.T) {
+func TestGetFromRegexNoSubMatch(t *testing.T) {
 	raw := []byte(`{"id":"123"}`)
 
 	result, _ := getFromRegex(raw, "123")
@@ -64,7 +64,7 @@ func TestGetFromJsonPath(t *testing.T) {
 
 }
 
-func TestGetFromJsonPath_EmptyExp(t *testing.T) {
+func TestGetFromJsonPathEmptyExp(t *testing.T) {
 	raw := []byte(`{"message":"Hello World"}`)
 
 	_, _, err := getFromJsonPath(raw, "")
@@ -74,7 +74,7 @@ func TestGetFromJsonPath_EmptyExp(t *testing.T) {
 
 }
 
-func TestGetFromJsonPath_EmptyRes(t *testing.T) {
+func TestGetFromJsonPathEmptyRes(t *testing.T) {
 	raw := []byte(`{"message":"Hello World"}`)
 
 	_, returnedString, err := getFromJsonPath(raw, "$.id")
