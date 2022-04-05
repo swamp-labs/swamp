@@ -1,24 +1,22 @@
 package assertion
 
 import (
-	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
+// Assertion defines checks to execute against an http response
 type Assertion struct {
 	Body    []bodyAssertion
 	Code    []int
 	Headers []map[string][]string
 }
 
-// Assertion defines a check to execute against response
 type bodyAssertion struct {
 	Kind       Kind
-	Target     string
 	Expression string `yaml:"exp"`
-	Values     []int
-	Variable   string
+	Variable   string `yaml:"variable"`
 }
 
 type Kind string
@@ -28,9 +26,11 @@ const (
 	jsonPath Kind = "jsonpath"
 )
 
+// AssertResponse executes all assertions defined by user
+// it calls validateCodeStatus, validateHeaders and validateBody
+// to verify each kind of assertions
 func AssertResponse(a Assertion, resp *http.Response, m map[string]string) (valid bool, err error) {
 	validBody := true
-
 	validCode := a.validateCodeStatus(resp.StatusCode)
 	validHeaders := a.validateHeaders(&resp.Header)
 	if resp.ContentLength > 0 {
@@ -38,16 +38,14 @@ func AssertResponse(a Assertion, resp *http.Response, m map[string]string) (vali
 		if err != nil {
 			return false, err
 		}
-
 		if a.Body != nil {
-			for _, ba := range a.Body {
-				v, _, _ := ba.validateBody(body, m)
-				if !v {
-					validBody = false
-				}
+			validBody, err = a.validateBody(body, m)
+			if err != nil {
+				return false, err
 			}
 		}
 	}
+	log.Println("validCode:", validCode, "validBody:", validBody, "validHeaders:", validHeaders)
 	validResp := validCode && validBody && validHeaders
 	return validResp, nil
 }
@@ -73,35 +71,35 @@ func (a *Assertion) validateCodeStatus(statusCode int) bool {
 
 // validateBody verify if body matchs with the expression given
 // in assertions.Body, it can be regex, jsonPath (or other in the future)
-func (ba *bodyAssertion) validateBody(raw []byte, m map[string]string) (bool, map[string]string, error) {
-
-	switch ba.Kind {
-	case regex:
-		v, err := validateWithRegex(raw, ba.Expression)
-		if err != nil {
-			return false, nil, err
-		}
-		if ba.Variable != "" && v {
-			result, err := getFromRegex(raw, ba.Expression)
+func (a *Assertion) validateBody(raw []byte, m map[string]string) (bool, error) {
+	valid := true
+	for _, b := range a.Body {
+		switch b.Kind {
+		case regex:
+			matched, err := validateWithRegex(raw, b.Expression)
 			if err != nil {
-				return false, nil, err
+				return false, err
 			}
-			if result != "" {
-				m[ba.Variable] = result
+			if b.Variable != "" && matched {
+				result, err := getFromRegex(raw, b.Expression)
+				if err != nil {
+					return false, err
+				}
+				m[b.Variable] = result
 			}
+			valid = valid && matched
+		case jsonPath:
+			matched, result, err := getFromJsonPath(raw, b.Expression)
+			if err != nil {
+				return false, err
+			}
+			if b.Variable != "" && matched {
+				m[b.Variable] = result
+			}
+			valid = valid && matched
 		}
-		return v, m, nil
-	case jsonPath:
-		matched, result, err := getFromJsonPath(raw, ba.Expression)
-		if err != nil {
-			return false, nil, err
-		}
-		if result != "" && ba.Variable != "" {
-			m[ba.Variable] = result
-		}
-		return matched, m, nil
 	}
-	return false, nil, errors.New("error: no assertion kind found")
+	return valid, nil
 }
 
 // validateHeaders verify for each key []values inserted by user if

@@ -21,7 +21,8 @@ simulation:
         exp: $.id
         variable: id
       - kind: regex
-        exp: '(\d{1,3})'
+        exp: '(\d{4,})'
+        variable: date
       code:
         - 201
 

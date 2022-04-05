@@ -30,7 +30,8 @@ func (r *Request) AddQueryParam(key string, value string) *Request {
 	return r
 }
 
-// Execute generate send the http request using client trace
+// Execute send the http request using client trace
+// and call AssertResponse function to validate the response
 func (r *Request) Execute(m map[string]string) (bool, error) {
 	client := &http.Client{}
 	clientTrace := Trace{}
@@ -51,7 +52,6 @@ func (r *Request) Execute(m map[string]string) (bool, error) {
 	}
 	defer resp.Body.Close()
 	clientTrace.Done()
-
 	v, err := as.AssertResponse(r.Assertions, resp, m)
 	if err != nil {
 		return false, err

@@ -2,10 +2,9 @@ package assertion
 
 import (
 	"encoding/json"
-	"log"
 	"regexp"
 
-	"github.com/yalp/jsonpath"
+	"github.com/PaesslerAG/jsonpath"
 )
 
 // getFromRegex search regular expression in []byte passed in arguments
@@ -18,15 +17,16 @@ func getFromRegex(raw []byte, exp string) (string, error) {
 		return "", err
 	}
 	result := re.FindAllSubmatch(raw, -1)
-	if result != nil {
-		for i := range result {
+	for i := range result {
+		if len(result[i]) > 1 {
 			s = s + string(result[i][1])
 		}
-		log.Println("concat value:", s)
 	}
 	return s, nil
 }
 
+// validateWithRegex check if the regex expression match with the
+// raw []byte passed in parameters, returns boolean with the result
 func validateWithRegex(raw []byte, exp string) (bool, error) {
 	re, err := regexp.Compile(exp)
 	if err != nil {
@@ -43,19 +43,16 @@ func getFromJsonPath(raw []byte, exp string) (bool, string, error) {
 	var body interface{}
 	err := json.Unmarshal(raw, &body)
 	if err != nil {
-		return false, "", nil
+		return false, "", err
 	}
-	result, err := jsonpath.Read(body, exp)
-	log.Println("Jsonpath result:", result, "expression:", exp)
+	result, err := jsonpath.Get(exp, body)
 	if err != nil {
-		return false, "", nil
+		return false, "", err
 	}
 	if result != nil {
-		log.Println(result)
 		variable := result.(string)
 
 		return true, variable, nil
 	}
-
 	return false, "", nil
 }
