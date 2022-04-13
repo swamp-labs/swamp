@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/swamp-labs/swamp/engine/httpreq"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 // Simulation wraps configuration file content
