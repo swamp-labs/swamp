@@ -112,12 +112,12 @@ func (a *Assertion) validateHeaders(headers *http.Header) bool {
 	// loop over table of maps in Assertion.Headers
 	for _, m := range a.Headers {
 		// loop over each map
-		for key, values := range m {
+		for headerName, headerValues := range m {
 			// loop over the assertions values to execute contains function
-			for _, value := range values {
+			for _, headerValue := range headerValues {
 				// We use the AND operation (&&). This way if a value define in assertion
 				// is not present, the request is considered not valid
-				valid = valid && contains(headers.Values(key), value)
+				valid = valid && contains(headers.Values(headerName), headerValue)
 			}
 		}
 	}
