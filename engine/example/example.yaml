@@ -17,11 +17,9 @@ simulation:
       - Access-Control-Allow-Origin: ["*"]
       - Content-Type: [application/json; charset=utf-8]
       body:      
-      - kind: jsonpath
-        exp: $.id
+      - jsonpath: $.id
         variable: id
-      - kind: regex
-        exp: '(\d{4,})'
+      - regex: '(\d{4,})'
         variable: date
       code:
         - 201
@@ -31,9 +29,9 @@ simulation:
     url: https://reqres.in/api/users/${id}
     <<: *headers
     assertions:
-    - kind: jsonpath
-      exp: $.id
-      variable: id
+      body:
+      - jsonpath: $.id
+        variable: id
   
   g2: 
   - name: req3

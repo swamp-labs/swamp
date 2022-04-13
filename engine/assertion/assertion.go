@@ -8,23 +8,23 @@ import (
 
 // Assertion defines checks to execute against an http response
 type Assertion struct {
-	Body    []bodyAssertion
+	Body    []expression
 	Code    []int
 	Headers []map[string][]string
 }
 
-type bodyAssertion struct {
-	Kind       Kind
-	Expression string `yaml:"exp"`
-	Variable   string `yaml:"variable"`
-}
+// type bodyAssertion struct {
+// 	Kind       Kind
+// 	Expression string `yaml:"exp"`
+// 	Variable   string `yaml:"variable"`
+// }
 
-type Kind string
+//type Kind string
 
-const (
-	regex    Kind = "regex"
-	jsonPath Kind = "jsonpath"
-)
+// const (
+// 	regex    Kind = "regex"
+// 	jsonPath Kind = "jsonpath"
+// )
 
 // AssertResponse executes all assertions defined by user
 // it calls validateCodeStatus, validateHeaders and validateBody
@@ -73,33 +73,22 @@ func (a *Assertion) validateCodeStatus(statusCode int) bool {
 // in assertions.Body, it can be regex, jsonPath (or other in the future)
 func (a *Assertion) validateBody(raw []byte, m map[string]string) (bool, error) {
 	valid := true
-	for _, b := range a.Body {
-		switch b.Kind {
-		case regex:
-			matched, err := validateWithRegex(raw, b.Expression)
-			if err != nil {
-				return false, err
-			}
-			if b.Variable != "" && matched {
-				result, err := getFromRegex(raw, b.Expression)
-				if err != nil {
-					return false, err
-				}
-				m[b.Variable] = result
-			}
-			valid = valid && matched
-		case jsonPath:
-			matched, result, err := getFromJsonPath(raw, b.Expression)
-			if err != nil {
-				return false, err
-			}
-			if b.Variable != "" && matched {
-				m[b.Variable] = result
-			}
-			valid = valid && matched
-		}
-
+	for _, exp := range a.Body {
+		matched, _ := exp.validate(raw, m)
+		valid = valid && matched
 	}
+	// if regex != "" {
+	// 	matched, err := validateWithRegex(raw, exp.regex)
+	// 	if err != nil {
+	// 		return false, err
+	// 	}
+	// 	if exp.variable != "" && matched {
+	// 		result, err := getFromRegex(raw, exp.regex)
+	// 		if err != nil {
+	// 			return false, err
+	// 		}
+	// 		m[exp.variable] = result
+	// 	}
 	return valid, nil
 }
 
@@ -131,4 +120,45 @@ func contains(s []string, str string) bool {
 		}
 	}
 	return false
+}
+
+type expression interface {
+	validate(raw []byte, m map[string]string) (bool, error)
+}
+
+type JsonPath struct {
+	jsonpath string `yaml:"jsonpath"`
+	variable string `yaml:"variable"`
+}
+
+type Regex struct {
+	regex    string `yaml:"regex"`
+	variable string `yaml:"variable"`
+}
+
+func (jsp *JsonPath) validate(raw []byte, m map[string]string) (bool, error) {
+	matched, result, err := getFromJsonPath(raw, jsp.jsonpath)
+	if err != nil {
+		return false, err
+	}
+	if jsp.variable != "" && matched {
+		m[jsp.variable] = result
+	}
+	return matched, nil
+}
+
+func (r *Regex) validate(raw []byte, m map[string]string) (bool, error) {
+	matched, err := validateWithRegex(raw, r.regex)
+	if err != nil {
+		return false, err
+	}
+	if r.variable != "" && matched {
+		result, err := getFromRegex(raw, r.regex)
+		if err != nil {
+			return false, err
+		}
+		m[r.variable] = result
+	}
+	return matched, nil
+
 }
