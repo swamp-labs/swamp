@@ -2,39 +2,58 @@ package assertion
 
 import (
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"testing"
 )
 
-func TestAssertResponse(t *testing.T) {
+func TestAssertResponseTrue(t *testing.T) {
 	var a Assertion
 	a.Code = []int{201}
-	a.Body = []expression{&JsonPath{"$.id", "id"}, &Regex{"(\\d{1,3})", "id"}}
+	a.Body = []BodyAssert{{"$.id", "id", ""}, {"", "(\\d{1,3})", "id"}}
 	var r http.Response
 	r.Body = io.NopCloser(strings.NewReader(`{"id":"123"}`))
 	r.StatusCode = 201
 	boolean, err := AssertResponse(a, &r, map[string]string{})
 
 	if !boolean {
-		t.Error("validate was incorrect, should be true, result:", boolean)
+		t.Error("AssertResponse was incorrect, should be true, result:", boolean)
 	}
 	if err != nil {
-		t.Error("validate was incorrect", err)
+		t.Error("AssertResponse was incorrect", err)
 	}
 }
 
-func TestValidateBody(t *testing.T) {
-	var a expression = &JsonPath{"$.id", "id"}
-	raw := []byte(`{"id":"123"}`)
+func TestAssertResponseCodeFalse(t *testing.T) {
+	var a Assertion
+	a.Code = []int{500}
+	a.Body = []BodyAssert{{"$.id", "id", ""}, {"", "(\\d{1,3})", "id"}}
+	var r http.Response
+	r.Body = io.NopCloser(strings.NewReader(`{"id":"123"}`))
+	r.StatusCode = 201
+	boolean, err := AssertResponse(a, &r, map[string]string{})
 
-	boolean, err := a.validate(raw, map[string]string{})
-	log.Println(boolean)
-	if !boolean {
-		t.Error("validate was incorrect, should be true, result:", boolean)
+	if boolean {
+		t.Error("AssertResponse was incorrect, should be false, result:", boolean)
 	}
 	if err != nil {
-		t.Error("validate was incorrect", err)
+		t.Error("AssertResponse was incorrect", err)
+	}
+}
+
+func TestAssertResponseBodyFalse(t *testing.T) {
+	var a Assertion
+	a.Code = []int{500}
+	a.Body = []BodyAssert{{"$.id", "id", ""}, {"", "(\\d{1,3})", "id"}}
+	var r http.Response
+	r.Body = io.NopCloser(strings.NewReader(`{"code":"123"}`))
+	r.StatusCode = 201
+	boolean, err := AssertResponse(a, &r, map[string]string{})
+
+	if boolean {
+		t.Error("AssertResponse was incorrect, should be true, result:", boolean)
+	}
+	if err != nil {
+		t.Error("AssertResponse was incorrect", err)
 	}
 }
