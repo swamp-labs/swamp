@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 )
@@ -22,20 +21,14 @@ func main() {
 	t := config.Simulation
 
 	for k := range t {
-		fmt.Println("key:", k)
-		fmt.Println("value", t[k])
 		table := t[k]
 		sessionVar := make(map[string]string)
 
 		for _, r := range table {
-			v, err := r.Execute(sessionVar)
+			_, err := r.Execute(sessionVar)
 			if err != nil {
 				log.Println(err)
 			}
-			log.Println(r, v)
-
 		}
-		log.Println("sessionVar:", sessionVar)
-
 	}
 }

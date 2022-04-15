@@ -1,16 +1,13 @@
 package httpreq
 
 import (
+	"io"
+	"log"
 	"net/http"
 	"net/http/httptrace"
 
 	as "github.com/swamp-labs/swamp/engine/assertion"
 )
-
-// type QueryParameter struct {
-// 	Key   string `yaml:"key"`
-// 	Value string `yaml:"value"`
-// }
 
 // Request struct defines all parameters for http requests to execute
 type Request struct {
@@ -51,11 +48,32 @@ func (r *Request) Execute(m map[string]string) (bool, error) {
 		return false, err
 	}
 	defer resp.Body.Close()
-	clientTrace.Done()
+	s := clientTrace.Done()
 	v, err := as.AssertResponse(r.Assertions, resp, m)
 	if err != nil {
 		return false, err
 	}
+	r.displayResult(resp, m, v, s)
 
 	return v, nil
+}
+
+func (r *Request) displayResult(resp *http.Response, m map[string]string, b bool, s *Sample) {
+	body, _ := io.ReadAll(resp.Body)
+	log.Println("#######################################")
+	log.Println("--------------- Request ---------------")
+	log.Println("Request name :", r.Name)
+	log.Println("Target :", r.Verb, r.URL)
+	log.Println("---------------------------------------")
+	log.Println("--------------- Response --------------")
+	log.Println("Response code :", resp.StatusCode)
+	log.Println("Response body :", string(body))
+	log.Println("---------------------------------------")
+	log.Println("---------- Assertions Result ----------")
+	log.Println("Global validation :", b)
+	log.Println("Returned variables :", m)
+	log.Println("---------------------------------------")
+	log.Println("------------ Request traces -----------")
+	s.displayTrace()
+	log.Println("#######################################")
 }
