@@ -72,8 +72,8 @@ func (r *Request) displayResult(resp *http.Response, m map[string]string, b bool
 	log.Println("---------- Assertions Result ----------")
 	log.Println("Global validation :", b)
 	log.Println("Returned variables :", m)
-	log.Println("---------------------------------------")
-	log.Println("------------ Request traces -----------")
+	log.Println("***************************************")
+	log.Println("************ Request traces ***********")
 	s.displayTrace()
 	log.Println("#######################################")
 }

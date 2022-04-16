@@ -20,14 +20,14 @@ func TestAssertResponseTrue(t *testing.T) {
 		t.Error("AssertResponse was incorrect, should be true, result:", boolean)
 	}
 	if err != nil {
-		t.Error("AssertResponse was incorrect", err)
+		t.Error("AssertResponseTrue was incorrect", err)
 	}
 }
 
 func TestAssertResponseCodeFalse(t *testing.T) {
 	var a Assertion
 	a.Code = []int{500}
-	a.Body = []BodyAssert{{"$.id", "id", ""}, {"", "(\\d{1,3})", "id"}}
+	a.Body = []BodyAssert{{"$.id", "id", ""}}
 	var r http.Response
 	r.Body = io.NopCloser(strings.NewReader(`{"id":"123"}`))
 	r.StatusCode = 201
@@ -37,7 +37,7 @@ func TestAssertResponseCodeFalse(t *testing.T) {
 		t.Error("AssertResponse was incorrect, should be false, result:", boolean)
 	}
 	if err != nil {
-		t.Error("AssertResponse was incorrect", err)
+		t.Error("AssertResponseCodeFalse was incorrect", err)
 	}
 }
 
@@ -54,6 +54,6 @@ func TestAssertResponseBodyFalse(t *testing.T) {
 		t.Error("AssertResponse was incorrect, should be true, result:", boolean)
 	}
 	if err != nil {
-		t.Error("AssertResponse was incorrect", err)
+		t.Error("AssertResponseBodyFalse was incorrect", err)
 	}
 }

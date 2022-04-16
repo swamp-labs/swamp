@@ -1,7 +1,6 @@
 package assertion
 
 import (
-	"log"
 	"testing"
 )
 
@@ -30,7 +29,6 @@ func TestValidateHeadersEmpty(t *testing.T) {
 	a.Code = nil
 
 	boolean := a.validateCodeStatus(200)
-	log.Println(boolean)
 	if !boolean {
 		t.Error("validateCodeStatus was incorrect, should be true, result:", boolean)
 	}
