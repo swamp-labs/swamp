@@ -7,7 +7,7 @@ x-headers: &headers
 simulation:
   g1: 
   - name: req1
-    verb: "POST"
+    method: "POST"
     protocol: https
     url: https://reqres.in/api/users
     <<: *headers
@@ -25,7 +25,7 @@ simulation:
         - 201
 
   - name: req2
-    verb: GET
+    method: GET
     url: https://reqres.in/api/users/${id}
     <<: *headers
     assertions:
@@ -35,7 +35,7 @@ simulation:
   
   g2: 
   - name: req3
-    verb: GET
+    method: GET
     url: https://reqres.in/api/users
     assertions:
       code:

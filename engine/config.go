@@ -10,8 +10,8 @@ import (
 
 // Simulation wraps configuration file content
 type Simulation struct {
-	Simulation map[string][]httpreq.Request
-	Volumes    []Volume `yaml:"volumes"`
+	Groups  map[string][]httpreq.Request
+	Volumes []Volume `yaml:"volumes"`
 }
 
 // Volume defines an execution plan.

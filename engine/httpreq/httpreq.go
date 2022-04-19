@@ -12,7 +12,7 @@ import (
 // Request struct defines all parameters for http requests to execute
 type Request struct {
 	Name            string              `yaml:"name"`
-	Verb            string              `yaml:"verb"`
+	Method          string              `yaml:"method"`
 	Protocol        string              `yaml:"protocol"`
 	Headers         []map[string]string `yaml:"headers"`
 	URL             string              `yaml:"url"`
@@ -32,7 +32,7 @@ func (r *Request) AddQueryParam(key string, value string) *Request {
 func (r *Request) Execute(m map[string]string) (bool, error) {
 	client := &http.Client{}
 	clientTrace := Trace{}
-	req, _ := http.NewRequest(r.Verb, r.URL, nil)
+	req, _ := http.NewRequest(r.Method, r.URL, nil)
 	q := req.URL.Query()
 	if len(r.QueryParameters) > 0 {
 		for key, value := range r.QueryParameters {
@@ -63,7 +63,7 @@ func (r *Request) displayResult(resp *http.Response, m map[string]string, b bool
 	log.Println("#######################################")
 	log.Println("--------------- Request ---------------")
 	log.Println("Request name :", r.Name)
-	log.Println("Target :", r.Verb, r.URL)
+	log.Println("Target :", r.Method, r.URL)
 	log.Println("---------------------------------------")
 	log.Println("--------------- Response --------------")
 	log.Println("Response code :", resp.StatusCode)
