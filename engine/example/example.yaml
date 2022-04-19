@@ -4,7 +4,7 @@ x-headers: &headers
     - Accept: "*/*"
 
 
-simulation:
+groups:
   g1: 
   - name: req1
     method: "POST"

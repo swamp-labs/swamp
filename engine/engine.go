@@ -18,7 +18,7 @@ func main() {
 		log.Fatal("Error while reading YAML file: ", err)
 	}
 	log.Println(config)
-	t := config.Simulation
+	t := config.Groups
 
 	for k := range t {
 		table := t[k]
