@@ -2,8 +2,8 @@ name: Go
 
 on:
   push:
-  paths:
-    - 'engine/**'
+    paths:
+      - 'engine/**'
 
 jobs:
 
