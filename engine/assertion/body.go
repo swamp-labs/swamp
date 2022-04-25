@@ -7,40 +7,47 @@ type BodyAssert struct {
 	Variable string
 }
 
-// validateBody verify if body match with the expression given
+// validateBody verify if body match with the BodyAssertion given
 // in assertions.Body, it can be regex, jsonPath (or other in the future)
 func (a *Assertion) validateBody(raw []byte, m map[string]string) (bool, error) {
 	valid := true
 	for _, exp := range a.Body {
-		var e expression
-		if exp.JsonPath != "" {
-			e = &JsonPath{jsonpath: exp.JsonPath, variable: exp.Variable}
-
-		}
-		if exp.Regex != "" {
-			e = &Regex{regex: exp.Regex, variable: exp.Variable}
-		}
-		matched, _ := e.validate(raw, m)
+		matched, _ := exp.validate(raw, m)
 		valid = valid && matched
 	}
 	return valid, nil
 }
 
-type expression interface {
+type BodyAssertion interface {
+	// TODO : m parameter shouldn't be a part of the validate function & function should be renamed to validateBody
 	validate(raw []byte, m map[string]string) (bool, error)
 }
 
-type JsonPath struct {
+type jsonPath struct {
 	jsonpath string `yaml:"jsonpath"`
 	variable string `yaml:"variable"`
 }
 
-type Regex struct {
+type regex struct {
 	regex    string `yaml:"regex"`
 	variable string `yaml:"variable"`
 }
 
-func (j *JsonPath) validate(raw []byte, m map[string]string) (bool, error) {
+func NewRegexAssertion(expression string, variable string) BodyAssertion {
+	return &regex{
+		regex:    expression,
+		variable: variable,
+	}
+}
+
+func NewJsonPathAssertion(jsonpath string, variable string) BodyAssertion {
+	return &jsonPath{
+		jsonpath: jsonpath,
+		variable: variable,
+	}
+}
+
+func (j *jsonPath) validate(raw []byte, m map[string]string) (bool, error) {
 	matched, result, err := getFromJsonPath(raw, j.jsonpath)
 	if err != nil {
 		return false, err
@@ -51,7 +58,7 @@ func (j *JsonPath) validate(raw []byte, m map[string]string) (bool, error) {
 	return matched, nil
 }
 
-func (r *Regex) validate(raw []byte, m map[string]string) (bool, error) {
+func (r *regex) validate(raw []byte, m map[string]string) (bool, error) {
 	matched, err := validateWithRegex(raw, r.regex)
 	if err != nil {
 		return false, err

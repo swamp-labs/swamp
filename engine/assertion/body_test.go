@@ -5,7 +5,7 @@ import (
 )
 
 func TestValidateBodyTrue(t *testing.T) {
-	var a expression = &JsonPath{"$.id", "id"}
+	var a BodyAssertion = &jsonPath{"$.id", "id"}
 	raw := []byte(`{"id":"123"}`)
 
 	boolean, err := a.validate(raw, map[string]string{})
@@ -18,7 +18,7 @@ func TestValidateBodyTrue(t *testing.T) {
 }
 
 func TestValidateBodyFalse(t *testing.T) {
-	var a expression = &JsonPath{"$.id", "id"}
+	var a BodyAssertion = &jsonPath{"$.id", "id"}
 	raw := []byte(`{"code":"123"}`)
 
 	_, err := a.validate(raw, map[string]string{})

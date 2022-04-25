@@ -7,7 +7,7 @@ import (
 
 // Assertion defines checks to execute against an http response
 type Assertion struct {
-	Body    []BodyAssert
+	Body    []BodyAssertion
 	Code    []int
 	Headers []map[string][]string
 }

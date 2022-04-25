@@ -7,9 +7,9 @@ import (
 	"github.com/PaesslerAG/jsonpath"
 )
 
-// getFromRegex search regular expression in []byte passed in arguments
+// getFromRegex search regular BodyAssertion in []byte passed in arguments
 // First returned value is a booleaan (true means exp match against raw, false instead)
-// func also returns a string which concat all successive matches of the expression
+// func also returns a string which concat all successive matches of the BodyAssertion
 func getFromRegex(raw []byte, exp string) (string, error) {
 	var s string
 	re, err := regexp.Compile(exp)
@@ -25,7 +25,7 @@ func getFromRegex(raw []byte, exp string) (string, error) {
 	return s, nil
 }
 
-// validateWithRegex check if the regex expression match with the
+// validateWithRegex check if the regex BodyAssertion match with the
 // raw []byte passed in parameters, returns boolean with the result
 func validateWithRegex(raw []byte, exp string) (bool, error) {
 	re, err := regexp.Compile(exp)

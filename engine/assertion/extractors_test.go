@@ -36,7 +36,7 @@ func TestGetFromRegexEmptyExp(t *testing.T) {
 	result, _ := getFromRegex(raw, "")
 
 	if result != "" {
-		t.Error("result should be empty with no regex expression, result:", result)
+		t.Error("result should be empty with no regex BodyAssertion, result:", result)
 	}
 }
 
@@ -46,7 +46,7 @@ func TestGetFromRegexNoSubMatch(t *testing.T) {
 	result, _ := getFromRegex(raw, "123")
 
 	if result != "" {
-		t.Error("result should be empty with no submatch expression, result:", result)
+		t.Error("result should be empty with no submatch BodyAssertion, result:", result)
 	}
 }
 
@@ -69,7 +69,7 @@ func TestGetFromJsonPathEmptyExp(t *testing.T) {
 
 	_, _, err := getFromJsonPath(raw, "")
 	if err == nil {
-		t.Error("error should not be nil with no jsonpath expression", err)
+		t.Error("error should not be nil with no jsonpath BodyAssertion", err)
 	}
 
 }
