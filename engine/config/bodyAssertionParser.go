@@ -40,10 +40,12 @@ func castJsonPathAssertionTemplateNode(node yaml.Node) (*jsonPathAssertionTempla
 	return &dst, nil
 }
 
+// decode transform an assertionsBlockTemplate into an assertion.Assertion
 func (assertions *assertionsBlockTemplate) decode() (assertion.Assertion, error) {
 
 	bodyAssertions := make([]assertion.BodyAssertion, cap(assertions.Body), len(assertions.Body))
 
+	// Decode all yaml nodes to body assertions
 	for i, node := range assertions.Body {
 		ass, err := yamlNodeToBodyAssertion(node)
 		if err != nil {
@@ -86,6 +88,7 @@ type regexAssertionTemplate struct {
 	Variable string `yaml:"variable" validate:"required"`
 }
 
+// toAssertion transforms a regexAssertionTemplate into an assertion.BodyAssertion
 func (tpl regexAssertionTemplate) toAssertion() assertion.BodyAssertion {
 	return assertion.NewRegexAssertion(tpl.Regex, tpl.Variable)
 }
@@ -95,6 +98,7 @@ type jsonPathAssertionTemplate struct {
 	Variable string `yaml:"variable" validate:"required"`
 }
 
+// toAssertion transforms a jsonPathAssertionTemplate into an assertion.BodyAssertion
 func (tpl jsonPathAssertionTemplate) toAssertion() assertion.BodyAssertion {
 	return assertion.NewJsonPathAssertion(tpl.JsonPath, tpl.Variable)
 }

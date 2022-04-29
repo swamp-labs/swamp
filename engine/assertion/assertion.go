@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// Assertion represents an assertion that can be applied to a http.Response
 type Assertion interface {
 	AssertResponse(resp *http.Response, m map[string]string) (bool, error)
 }
