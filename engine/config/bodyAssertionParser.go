@@ -40,24 +40,19 @@ func castJsonPathAssertionTemplateNode(node yaml.Node) (*jsonPathAssertionTempla
 	return &dst, nil
 }
 
-func (assertions *AssertionsBlockTemplate) decode() (assertion.Assertion, error) {
-	block := assertion.Assertion{
-		Code:    assertions.Code,
-		Headers: assertions.Headers,
-	}
+func (assertions *assertionsBlockTemplate) decode() (assertion.Assertion, error) {
 
 	bodyAssertions := make([]assertion.BodyAssertion, cap(assertions.Body), len(assertions.Body))
 
 	for i, node := range assertions.Body {
 		ass, err := yamlNodeToBodyAssertion(node)
 		if err != nil {
-			return assertion.Assertion{}, fmt.Errorf("fail to parse assertion : %v", err)
+			return nil, fmt.Errorf("fail to parse assertion : %v", err)
 		}
 		bodyAssertions[i] = ass
 	}
-	block.Body = bodyAssertions
 
-	return block, nil
+	return assertion.MakeRequestAssertion(bodyAssertions, assertions.Code, assertions.Headers), nil
 
 }
 
@@ -67,13 +62,13 @@ func yamlNodeToBodyAssertion(node yaml.Node) (assertion.BodyAssertion, error) {
 	var dst bodyAssertionTemplate
 
 	var err error
-	// Regex Assertion
+	// Regex assertion
 	dst, err = castRegexAssertionTemplateNode(node)
 	if err == nil {
 		return dst.toAssertion(), nil
 	}
 
-	// JsonPath Assertion
+	// JsonPath assertion
 	dst, err = castJsonPathAssertionTemplateNode(node)
 	if err == nil {
 		return dst.toAssertion(), nil

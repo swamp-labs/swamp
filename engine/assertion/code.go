@@ -3,7 +3,7 @@ package assertion
 // validateCodeStatus verify if the returned http code
 // matchs with at least one value provided by user
 // In case user did not provide any code, we check code is 2XX
-func (a *Assertion) validateCodeStatus(statusCode int) bool {
+func (a *assertion) validateCodeStatus(statusCode int) bool {
 
 	if a.Code == nil {
 		if statusCode > 199 && statusCode < 300 {

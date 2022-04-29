@@ -6,9 +6,9 @@ import "net/http"
 // the all the values exists for the associated key.
 // Example : - Access-Control-Allow-Origin: ["*"]
 // The function will find if the header exists with the associated value.
-func (a *Assertion) validateHeaders(headers *http.Header) bool {
+func (a *assertion) validateHeaders(headers *http.Header) bool {
 	valid := true
-	// loop over table of maps in Assertion.Headers
+	// loop over table of maps in assertion.Headers
 	for _, m := range a.Headers {
 		// loop over each map
 		for headerName, headerValues := range m {

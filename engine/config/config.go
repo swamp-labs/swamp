@@ -17,7 +17,7 @@ func Parse(configFile string) (s.Simulation, error) {
 		return nil, fmt.Errorf("fail to read config file %s : %v", configFile, err)
 	}
 
-	config := SimulationTemplate{}
+	config := simulationTemplate{}
 	err = yaml.Unmarshal(data, &config)
 
 	if err != nil {

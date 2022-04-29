@@ -1,15 +1,8 @@
 package assertion
 
-// BodyAssert define checks to execute against the response body
-type BodyAssert struct {
-	JsonPath string
-	Regex    string
-	Variable string
-}
-
 // validateBody verify if body match with the BodyAssertion given
 // in assertions.Body, it can be regex, jsonPath (or other in the future)
-func (a *Assertion) validateBody(raw []byte, m map[string]string) (bool, error) {
+func (a *assertion) validateBody(raw []byte, m map[string]string) (bool, error) {
 	valid := true
 	for _, exp := range a.Body {
 		matched, _ := exp.validate(raw, m)

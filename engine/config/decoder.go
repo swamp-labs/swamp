@@ -8,7 +8,7 @@ import (
 	volume "github.com/swamp-labs/swamp/engine/volume"
 )
 
-func (requestTemplate RequestTemplate) decode() (*httpreq.Request, error) {
+func (requestTemplate requestTemplate) decode() (*httpreq.Request, error) {
 	assertions, err := requestTemplate.Assertions.decode()
 	if err != nil {
 		return nil, err
@@ -26,11 +26,11 @@ func (requestTemplate RequestTemplate) decode() (*httpreq.Request, error) {
 	}, nil
 }
 
-func (v VolumeTemplate) decode() (volume.Volume, error) {
+func (v volumeTemplate) decode() (volume.Volume, error) {
 	return volume.MakeVolume(v.RequestGroup), nil
 }
 
-func parseGroups(groupTemplates map[string][]RequestTemplate) (map[string][]httpreq.Request, error) {
+func parseGroups(groupTemplates map[string][]requestTemplate) (map[string][]httpreq.Request, error) {
 	groups := make(map[string][]httpreq.Request)
 
 	for groupId, requestsTemplates := range groupTemplates {
@@ -47,7 +47,7 @@ func parseGroups(groupTemplates map[string][]RequestTemplate) (map[string][]http
 	return groups, nil
 }
 
-func (s SimulationTemplate) decode() (simulation.Simulation, error) {
+func (s simulationTemplate) decode() (simulation.Simulation, error) {
 	volumes := make([]volume.Volume, cap(s.Volumes), len(s.Volumes))
 	for i, volumeTpl := range s.Volumes {
 		v, err := volumeTpl.decode()

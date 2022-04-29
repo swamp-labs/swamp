@@ -5,7 +5,7 @@ import (
 )
 
 func TestValidateCodeStatusTrue(t *testing.T) {
-	var a Assertion
+	var a assertion
 	a.Code = []int{200}
 
 	boolean := a.validateCodeStatus(200)
@@ -15,7 +15,7 @@ func TestValidateCodeStatusTrue(t *testing.T) {
 }
 
 func TestValidateCodeStatusFalse(t *testing.T) {
-	var a Assertion
+	var a assertion
 	a.Code = []int{200}
 
 	boolean := a.validateCodeStatus(500)
@@ -25,7 +25,7 @@ func TestValidateCodeStatusFalse(t *testing.T) {
 }
 
 func TestValidateCodeStatusEmpty(t *testing.T) {
-	var a Assertion
+	var a assertion
 	a.Code = nil
 
 	boolean := a.validateCodeStatus(200)

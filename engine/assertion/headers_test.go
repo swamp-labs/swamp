@@ -5,7 +5,7 @@ import (
 )
 
 func TestValidateHeadersTrue(t *testing.T) {
-	var a Assertion
+	var a assertion
 	a.Code = []int{200}
 
 	boolean := a.validateCodeStatus(200)
@@ -15,7 +15,7 @@ func TestValidateHeadersTrue(t *testing.T) {
 }
 
 func TestValidateHeadersFalse(t *testing.T) {
-	var a Assertion
+	var a assertion
 	a.Code = []int{200}
 
 	boolean := a.validateCodeStatus(500)
@@ -25,7 +25,7 @@ func TestValidateHeadersFalse(t *testing.T) {
 }
 
 func TestValidateHeadersEmpty(t *testing.T) {
-	var a Assertion
+	var a assertion
 	a.Code = nil
 
 	boolean := a.validateCodeStatus(200)

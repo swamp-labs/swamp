@@ -49,7 +49,7 @@ func (r *Request) Execute(m map[string]string) (bool, error) {
 	}
 	defer resp.Body.Close()
 	s := clientTrace.Done()
-	v, err := as.AssertResponse(r.Assertions, resp, m)
+	v, err := r.Assertions.AssertResponse(resp, m)
 	if err != nil {
 		return false, err
 	}

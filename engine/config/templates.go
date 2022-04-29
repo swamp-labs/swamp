@@ -2,13 +2,13 @@ package config
 
 import "gopkg.in/yaml.v3"
 
-type AssertionsBlockTemplate struct {
+type assertionsBlockTemplate struct {
 	Body    []yaml.Node           `yaml:"body"`
 	Code    []int                 `yaml:"code"`
 	Headers []map[string][]string `yaml:"headers"`
 }
 
-type RequestTemplate struct {
+type requestTemplate struct {
 	Name            string                  `yaml:"name"`
 	Method          string                  `yaml:"method"`
 	Protocol        string                  `yaml:"protocol"`
@@ -16,17 +16,17 @@ type RequestTemplate struct {
 	URL             string                  `yaml:"url"`
 	Body            string                  `yaml:"body"`
 	QueryParameters map[string]string       `yaml:"query_parameters"`
-	Assertions      AssertionsBlockTemplate `yaml:"assertions"`
+	Assertions      assertionsBlockTemplate `yaml:"assertions"`
 }
 
-// VolumeTemplate defines an execution plan.
-type VolumeTemplate struct {
+// volumeTemplate defines an execution plan.
+type volumeTemplate struct {
 	RequestGroup string `yaml:"request_group"`
 	//	Execution    []string `yaml:"execution"`
 }
 
-// SimulationTemplate wraps configuration file content
-type SimulationTemplate struct {
-	Groups  map[string][]RequestTemplate `yaml:"groups"`
-	Volumes []VolumeTemplate             `yaml:"volume"`
+// simulationTemplate wraps configuration file content
+type simulationTemplate struct {
+	Groups  map[string][]requestTemplate `yaml:"groups"`
+	Volumes []volumeTemplate             `yaml:"volume"`
 }
