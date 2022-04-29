@@ -10,7 +10,7 @@ import (
 func TestAssertResponseTrue(t *testing.T) {
 	var a Assertion
 	a.Code = []int{201}
-	a.Body = []BodyAssert{{"$.id", "id", ""}, {"", "(\\d{1,3})", "id"}}
+	a.Body = []BodyAssertion{&jsonPath{"$.id", "id"}, &regex{"(\\d{1,3})", "id"}}
 	var r http.Response
 	r.Body = io.NopCloser(strings.NewReader(`{"id":"123"}`))
 	r.StatusCode = 201
@@ -27,7 +27,7 @@ func TestAssertResponseTrue(t *testing.T) {
 func TestAssertResponseCodeFalse(t *testing.T) {
 	var a Assertion
 	a.Code = []int{500}
-	a.Body = []BodyAssert{{"$.id", "id", ""}}
+	a.Body = []BodyAssertion{&jsonPath{"$.id", "id"}}
 	var r http.Response
 	r.Body = io.NopCloser(strings.NewReader(`{"id":"123"}`))
 	r.StatusCode = 201
@@ -44,7 +44,7 @@ func TestAssertResponseCodeFalse(t *testing.T) {
 func TestAssertResponseBodyFalse(t *testing.T) {
 	var a Assertion
 	a.Code = []int{500}
-	a.Body = []BodyAssert{{"$.id", "id", ""}, {"", "(\\d{1,3})", "id"}}
+	a.Body = []BodyAssertion{&jsonPath{"$.id", "id"}, &regex{"(\\d{1,3})", "id"}}
 	var r http.Response
 	r.Body = io.NopCloser(strings.NewReader(`{"code":"123"}`))
 	r.StatusCode = 201

@@ -2,14 +2,15 @@ package config
 
 import (
 	"fmt"
-	"github.com/swamp-labs/swamp/engine/simulation"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"log"
+
+	s "github.com/swamp-labs/swamp/engine/simulation"
+	"gopkg.in/yaml.v3"
 )
 
-// Parse read a YAML configuration file to extract a simulation.
-func Parse(configFile string) (simulation.Simulation, error) {
+// Parse read a YAML configuration file to extract a simulation
+func Parse(configFile string) (s.Simulation, error) {
 	log.Println("Parsing configuration file...")
 	data, err := ioutil.ReadFile(configFile)
 	if err != nil {
