@@ -12,8 +12,8 @@ func (a *assertion) validateBody(raw []byte, m map[string]string) (bool, error) 
 }
 
 type BodyAssertion interface {
-	// TODO : m parameter shouldn't be a part of the validate function & function should be renamed to validateBody
 	validate(raw []byte, m map[string]string) (bool, error)
+	Type() string
 }
 
 type jsonPath struct {
@@ -64,5 +64,12 @@ func (r *regex) validate(raw []byte, m map[string]string) (bool, error) {
 		m[r.variable] = result
 	}
 	return matched, nil
+}
 
+func (r *regex) Type() string {
+	return "REGEX"
+}
+
+func (j *jsonPath) Type() string {
+	return "JSONPATH"
 }
