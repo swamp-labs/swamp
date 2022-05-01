@@ -1,4 +1,4 @@
-name: Engine unit test
+name: Engine unit tests
 
 on:
   push:
