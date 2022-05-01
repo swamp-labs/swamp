@@ -1,4 +1,4 @@
-name: Go
+name: Engine unit test
 
 on:
   push:
