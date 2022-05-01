@@ -5,6 +5,6 @@
 ### USAGE
 
 ```
-export CONFIG_FILE="test.yaml" && go run *.go
+export CONFIG_FILE="./example/example.yaml" && go run *.go
 ```
 

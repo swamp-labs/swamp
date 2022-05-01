@@ -2,6 +2,7 @@ package httpreq
 
 import (
 	"crypto/tls"
+	"log"
 	"net"
 	"net/http/httptrace"
 	"sync/atomic"
@@ -28,6 +29,16 @@ type Sample struct {
 	// Detailed connection information.
 	ConnReused     bool
 	ConnRemoteAddr net.Addr
+}
+
+func (s *Sample) displayTrace() {
+	log.Println("DNS resolution duration :", s.DNSDuration)
+	log.Println("TLS Handshaking :", s.TLSHandshaking)
+	log.Println("Connection duration :", s.ConnDuration)
+	log.Println("Request duration :", s.ReqDuration)
+	log.Println("Sending (writing request) :", s.Sending)
+	log.Println("Waiting response :", s.WaitingResp)
+	log.Println("Receiving response :", s.Receiving)
 }
 
 // A Trace represents detailed information about a http request. Info are returned using
