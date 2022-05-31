@@ -7,6 +7,7 @@ import (
 	"net/http/httptrace"
 
 	as "github.com/swamp-labs/swamp/engine/assertion"
+	"github.com/swamp-labs/swamp/engine/parser"
 )
 
 // Request struct defines all parameters for http requests to execute
@@ -39,6 +40,8 @@ func (r *Request) Execute(m map[string]string) (bool, error) {
 			q.Add(key, value)
 		}
 	}
+	r.initFieldsParser(m)
+	r.initArraysParser(m)
 
 	clientTraceCtx := httptrace.WithClientTrace(req.Context(), clientTrace.Trace())
 	req = req.WithContext(clientTraceCtx)
@@ -56,6 +59,33 @@ func (r *Request) Execute(m map[string]string) (bool, error) {
 	r.displayResult(resp, m, v, s)
 
 	return v, nil
+}
+
+func MakeParser(s *string) parser.Field {
+	return parser.Field{
+		Field: s,
+	}
+}
+
+func MakeArrayParser(a *[]map[string]string) parser.ArrayOfMap {
+	return parser.ArrayOfMap{
+		M: a,
+	}
+}
+
+func (r *Request) initFieldsParser(m map[string]string) {
+	t := []*string{&r.URL, &r.Body}
+	for _, s := range t {
+		f := MakeParser(s)
+		f.Parse(m)
+	}
+}
+func (r *Request) initArraysParser(m map[string]string) {
+	t := []*[]map[string]string{&r.Headers}
+	for _, a := range t {
+		f := MakeArrayParser(a)
+		f.Parse(m)
+	}
 }
 
 func (r *Request) displayResult(resp *http.Response, m map[string]string, b bool, s *Sample) {
