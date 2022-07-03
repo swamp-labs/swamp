@@ -2,7 +2,7 @@ package assertion
 
 // validateBody verify if body match with the BodyAssertion given
 // in assertions.Body, it can be regex, jsonPath (or other in the future)
-func (a *assertion) validateBody(raw []byte, m map[string]string) (bool, error) {
+func (a assertion) validateBody(raw []byte, m map[string]string) (bool, error) {
 	valid := true
 	for _, exp := range a.Body {
 		matched, _ := exp.validate(raw, m)
@@ -27,20 +27,20 @@ type regex struct {
 }
 
 func NewRegexAssertion(expression string, variable string) BodyAssertion {
-	return &regex{
+	return regex{
 		regex:    expression,
 		variable: variable,
 	}
 }
 
 func NewJsonPathAssertion(jsonpath string, variable string) BodyAssertion {
-	return &jsonPath{
+	return jsonPath{
 		jsonpath: jsonpath,
 		variable: variable,
 	}
 }
 
-func (j *jsonPath) validate(raw []byte, m map[string]string) (bool, error) {
+func (j jsonPath) validate(raw []byte, m map[string]string) (bool, error) {
 	matched, result, err := getFromJsonPath(raw, j.jsonpath)
 	if err != nil {
 		return false, err
@@ -51,7 +51,7 @@ func (j *jsonPath) validate(raw []byte, m map[string]string) (bool, error) {
 	return matched, nil
 }
 
-func (r *regex) validate(raw []byte, m map[string]string) (bool, error) {
+func (r regex) validate(raw []byte, m map[string]string) (bool, error) {
 	matched, err := validateWithRegex(raw, r.regex)
 	if err != nil {
 		return false, err
@@ -66,10 +66,10 @@ func (r *regex) validate(raw []byte, m map[string]string) (bool, error) {
 	return matched, nil
 }
 
-func (r *regex) Type() string {
+func (r regex) Type() string {
 	return "REGEX"
 }
 
-func (j *jsonPath) Type() string {
+func (j jsonPath) Type() string {
 	return "JSONPATH"
 }
