@@ -11,6 +11,10 @@ import (
 	"testing"
 )
 
+const (
+	ContentTypeHeader = "Content-Type"
+)
+
 func TestParse(t *testing.T) {
 
 	_, fileName, _, _ := runtime.Caller(0)
@@ -36,7 +40,7 @@ func TestParse(t *testing.T) {
 						Method:   "POST",
 						Protocol: "https",
 						Headers: []map[string]string{
-							{"Content-Type": "application/json"},
+							{ContentTypeHeader: "application/json"},
 							{"Accept": "*/*"},
 						},
 						URL:             "https://reqres.in/api/users",
@@ -50,7 +54,7 @@ func TestParse(t *testing.T) {
 							[]int{201},
 							[]map[string][]string{
 								{"Access-Control-Allow-Origin": {"*"}},
-								{"Content-Type": {"application/json; charset=utf-8"}},
+								{ContentTypeHeader: {"application/json; charset=utf-8"}},
 							},
 						),
 					},
@@ -58,7 +62,7 @@ func TestParse(t *testing.T) {
 							Name:   "req2",
 							Method: "GET",
 							Headers: []map[string]string{
-								{"Content-Type": "application/json"},
+								{ContentTypeHeader: "application/json"},
 								{"Accept": "*/*"},
 							},
 							URL:             "https://reqres.in/api/users/${id}",
