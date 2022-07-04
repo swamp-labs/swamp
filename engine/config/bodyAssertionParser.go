@@ -8,34 +8,15 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// castRegexAssertionTemplateNode uses the playground validator function to
-// determine if the yaml node matchs with the regexAssertionTemplate structure
-func castRegexAssertionTemplateNode(node yaml.Node) (*regexAssertionTemplate, error) {
-	dst := regexAssertionTemplate{}
+func castTemplateNodeToBodyAssertion[T bodyAssertionTemplate](node yaml.Node, dst T) (*T, error) {
 	err := node.Decode(&dst)
 	if err != nil {
-		return nil, fmt.Errorf("fail to cast node to regex assertion template : %v", err)
+		return nil, fmt.Errorf("fail to cast node : %v", err)
 	}
 	validate := validator.New()
 	err = validate.Struct(dst)
 	if err != nil {
-		return nil, fmt.Errorf("can not validate regex assertion template : %v", err)
-	}
-	return &dst, nil
-}
-
-// castJsonPathAssertionTemplateNode uses the playground validator to
-// determine if the yaml node matchs with the jsonPathAssertionTemplate structure
-func castJsonPathAssertionTemplateNode(node yaml.Node) (*jsonPathAssertionTemplate, error) {
-	dst := jsonPathAssertionTemplate{}
-	err := node.Decode(&dst)
-	if err != nil {
-		return nil, fmt.Errorf("fail to cast node to jsonpath assertion template : %v", err)
-	}
-	validate := validator.New()
-	err = validate.Struct(dst)
-	if err != nil {
-		return nil, fmt.Errorf("can not validate jsonpath assertion template : %v", err)
+		return nil, fmt.Errorf("can not validate structure : %v", err)
 	}
 	return &dst, nil
 }
@@ -65,13 +46,13 @@ func yamlNodeToBodyAssertion(node yaml.Node) (assertion.BodyAssertion, error) {
 
 	var err error
 	// Regex assertion
-	dst, err = castRegexAssertionTemplateNode(node)
+	dst, err = castTemplateNodeToBodyAssertion[regexAssertionTemplate](node, regexAssertionTemplate{})
 	if err == nil {
 		return dst.toAssertion(), nil
 	}
 
 	// JsonPath assertion
-	dst, err = castJsonPathAssertionTemplateNode(node)
+	dst, err = castTemplateNodeToBodyAssertion[jsonPathAssertionTemplate](node, jsonPathAssertionTemplate{})
 	if err == nil {
 		return dst.toAssertion(), nil
 	}

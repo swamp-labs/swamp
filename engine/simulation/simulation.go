@@ -24,7 +24,7 @@ func (s simulation) GetGroups() map[string][]httpreq.Request {
 }
 
 func MakeSimulation(volumes []volume.Volume, groups map[string][]httpreq.Request) Simulation {
-	return &simulation{
+	return simulation{
 		volumes: volumes,
 		groups:  groups,
 	}

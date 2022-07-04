@@ -11,7 +11,7 @@ type Assertion interface {
 }
 
 func MakeRequestAssertion(body []BodyAssertion, code []int, headers []map[string][]string) Assertion {
-	return &assertion{
+	return assertion{
 		Body:    body,
 		Code:    code,
 		Headers: headers,
@@ -28,7 +28,7 @@ type assertion struct {
 // AssertResponse executes all assertions defined by user
 // it calls validateCodeStatus, validateHeaders and validateBody
 // to verify each kind of assertions
-func (a *assertion) AssertResponse(resp *http.Response, m map[string]string) (valid bool, err error) {
+func (a assertion) AssertResponse(resp *http.Response, m map[string]string) (valid bool, err error) {
 	validBody := true
 	validCode := a.validateCodeStatus(resp.StatusCode)
 	validHeaders := a.validateHeaders(&resp.Header)
