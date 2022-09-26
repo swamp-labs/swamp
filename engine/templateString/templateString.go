@@ -37,17 +37,14 @@ func YamlNodeToTemplateString(node *yaml.Node) TemplateString {
 
 func (t *TemplateString) ToString(context map[string]string) (string, error) {
 
-	if len(t.Keys) > 0 {
-		values := make([]string, len(t.Keys), cap(t.Keys))
-		for i, key := range t.Keys {
-			values[i] = context[key]
-		}
-
-		i := toInterface(values)
-
-		return fmt.Sprintf(t.Format, i...), nil
+	values := make([]string, len(t.Keys), cap(t.Keys))
+	for i, key := range t.Keys {
+		values[i] = context[key]
 	}
-	return t.Format, nil
+
+	i := toInterface(values)
+
+	return fmt.Sprintf(t.Format, i...), nil
 }
 
 func toInterface(list []string) []interface{} {
