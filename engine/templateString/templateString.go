@@ -18,15 +18,16 @@ func YamlNodeToTemplateString(node *yaml.Node) TemplateString {
 	ts := TemplateString{}
 	re, _ := regexp.Compile(exp)
 
-	result := re.FindAllStringSubmatch(node.Value, -1)
-	ts.Keys = make([]string, len(result), cap(result))
+	matchs := re.FindAllStringSubmatch(node.Value, -1)
+	keys = make([]string, len(result), cap(result))
 
-	for i := range result {
-
-		if len(result[i]) > 0 {
-			ts.Keys[i] = result[i][1]
+	for _, match := range matchs {
+		if len(match) > 0 {
+			ts.Keys = append(ts.Keys, match[0])
 		}
 	}
+	
+	ts.Keys = keys
 	if len(result) == 0 {
 		ts.Keys = nil
 	}
