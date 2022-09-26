@@ -34,7 +34,6 @@ func (r *Request) Execute(m map[string]string) (bool, error) {
 	clientTrace := Trace{}
 
 	url, _ := r.URL.ToString(m)
-	log.Println("url targeted", url)
 	req, _ := http.NewRequest(r.Method, url, nil)
 	q := req.URL.Query()
 	if len(r.QueryParameters) > 0 {

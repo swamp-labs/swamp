@@ -16,19 +16,18 @@ type TemplateString struct {
 func YamlNodeToTemplateString(node *yaml.Node) TemplateString {
 
 	ts := TemplateString{}
-	re, _ := regexp.Compile(exp)
+	re, _ := regexp.Compile(templateStringExpressionRegex)
 
-	matchs := re.FindAllStringSubmatch(node.Value, -1)
-	keys = make([]string, len(result), cap(result))
+	matches := re.FindAllStringSubmatch(node.Value, -1)
+	ts.Keys = make([]string, len(matches), cap(matches))
 
-	for _, match := range matchs {
+	for i, match := range matches {
 		if len(match) > 0 {
-			ts.Keys = append(ts.Keys, match[0])
+			ts.Keys[i] = match[1]
 		}
 	}
-	
-	ts.Keys = keys
-	if len(result) == 0 {
+
+	if len(matches) == 0 {
 		ts.Keys = nil
 	}
 	ts.Format = re.ReplaceAllString(node.Value, "%s")
