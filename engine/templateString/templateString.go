@@ -6,7 +6,7 @@ import (
 	"regexp"
 )
 
-const exp string = `\${((\w)+)}`
+const templateStringExpressionRegex string = `\${((\w)+)}`
 
 type TemplateString struct {
 	Format string   // Should be something like https://swamp.com/%s/%s from URL https://swamp.com/${id}/${simulation}
