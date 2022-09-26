@@ -5,7 +5,7 @@ x-headers: &headers
 
 
 groups:
-  g1: 
+  g1:
   - name: req1
     method: "POST"
     protocol: https
@@ -16,7 +16,7 @@ groups:
       headers:
       - Access-Control-Allow-Origin: ["*"]
       - Content-Type: [application/json; charset=utf-8]
-      body:      
+      body:
       - jsonpath: $.id
         variable: id
       - regex: '(\d{4,})'
@@ -26,14 +26,14 @@ groups:
 
   - name: req2
     method: GET
-    url: https://reqres.in/api/users/${id}
+    url: https://reqres.in/api/users/${id}/${date}
     <<: *headers
     assertions:
       body:
       - jsonpath: $.id
         variable: id
-  
-  g2: 
+
+  g2:
   - name: req3
     method: GET
     url: https://reqres.in/api/users
@@ -43,7 +43,7 @@ groups:
 
 volumes:
  - request_group: g1
-#   execution: 
+#   execution:
 #   - wait: 5
 #   - rps: 5
 #     during: 60s

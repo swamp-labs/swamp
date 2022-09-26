@@ -2,9 +2,9 @@ package config
 
 import (
 	"fmt"
-
 	"github.com/swamp-labs/swamp/engine/httpreq"
 	"github.com/swamp-labs/swamp/engine/simulation"
+	ts "github.com/swamp-labs/swamp/engine/templateString"
 	volume "github.com/swamp-labs/swamp/engine/volume"
 )
 
@@ -13,13 +13,15 @@ func (requestTemplate requestTemplate) decode() (*httpreq.Request, error) {
 	if err != nil {
 		return nil, err
 	}
+	url := ts.TemplateString{}
+	url = ts.YamlNodeToTemplateString(&requestTemplate.URL)
 
 	return &httpreq.Request{
 		Name:            requestTemplate.Name,
 		Method:          requestTemplate.Method,
 		Protocol:        requestTemplate.Protocol,
 		Headers:         requestTemplate.Headers,
-		URL:             requestTemplate.URL,
+		URL:             url,
 		Body:            requestTemplate.Body,
 		QueryParameters: requestTemplate.QueryParameters,
 		Assertions:      assertions,

@@ -13,13 +13,13 @@ type assertionsBlockTemplate struct {
 	Headers []map[string][]string `yaml:"headers"`
 }
 
-// requestTemplate defines the yam template used to define a request
+// requestTemplate defines the yaml template used to define a request
 type requestTemplate struct {
 	Name            string                  `yaml:"name"`
 	Method          string                  `yaml:"method"`
 	Protocol        string                  `yaml:"protocol"`
 	Headers         []map[string]string     `yaml:"headers"`
-	URL             string                  `yaml:"url"`
+	URL             yaml.Node               `yaml:"url"`
 	Body            string                  `yaml:"body"`
 	QueryParameters map[string]string       `yaml:"query_parameters"`
 	Assertions      assertionsBlockTemplate `yaml:"assertions"`
