@@ -13,9 +13,7 @@ type TemplateString struct {
 	Keys   []string // These are the extracted variables from URL ["id", "simulation"]
 }
 
-func YamlNodeToTemplateString(node *yaml.Node) TemplateString {
-
-	ts := TemplateString{}
+func (ts *TemplateString) UnmarshalYAML(node *yaml.Node) error {
 	re, _ := regexp.Compile(templateStringExpressionRegex)
 
 	matches := re.FindAllStringSubmatch(node.Value, -1)
@@ -32,7 +30,7 @@ func YamlNodeToTemplateString(node *yaml.Node) TemplateString {
 	}
 	ts.Format = re.ReplaceAllString(node.Value, "%s")
 
-	return ts
+	return nil
 }
 
 func (t *TemplateString) ToString(context map[string]string) (string, error) {
