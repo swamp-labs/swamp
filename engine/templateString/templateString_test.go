@@ -43,7 +43,7 @@ func TestTemplateStringToStringNoMatchingKey(t *testing.T) {
 	}
 }
 
-func TestTemplateString_UnmarshalYAML(t *testing.T) {
+func TestTemplateStringUnmarshalYAML(t *testing.T) {
 	getUnmarshall := func(txt string) *yaml.Node {
 		nodeStruct := struct {
 			node yaml.Node
@@ -85,7 +85,7 @@ func TestTemplateString_UnmarshalYAML(t *testing.T) {
 				Keys:   []string{"myVar"},
 			},
 			args: args{
-				node: getUnmarshall("toto ${myVar} tata"),
+				node: getUnmarshall("toto ${var.myVar} tata"),
 			},
 			wantErr: false,
 		},

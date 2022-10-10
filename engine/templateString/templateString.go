@@ -6,33 +6,35 @@ import (
 	"regexp"
 )
 
-const templateStringExpressionRegex string = `\${((\w)+)}`
+const templateStringExpressionRegex string = `\${var\.((\w)+)}`
 
 type TemplateString struct {
 	Format string   // Should be something like https://swamp.com/%s/%s from URL https://swamp.com/${id}/${simulation}
 	Keys   []string // These are the extracted variables from URL ["id", "simulation"]
 }
 
-func (ts *TemplateString) UnmarshalYAML(node *yaml.Node) error {
+// UnmarshalYAML decodes a yaml node to convert it into a template string
+func (t *TemplateString) UnmarshalYAML(node *yaml.Node) error {
 	re, _ := regexp.Compile(templateStringExpressionRegex)
 
 	matches := re.FindAllStringSubmatch(node.Value, -1)
-	ts.Keys = make([]string, len(matches), cap(matches))
+	t.Keys = make([]string, len(matches), cap(matches))
 
 	for i, match := range matches {
 		if len(match) > 0 {
-			ts.Keys[i] = match[1]
+			t.Keys[i] = match[1]
 		}
 	}
 
 	if len(matches) == 0 {
-		ts.Keys = nil
+		t.Keys = nil
 	}
-	ts.Format = re.ReplaceAllString(node.Value, "%s")
-
+	t.Format = re.ReplaceAllString(node.Value, "%s")
 	return nil
 }
 
+// ToString returns the templateString formatted as a string
+// using fmt.Sprintf function
 func (t *TemplateString) ToString(context map[string]string) (string, error) {
 
 	values := make([]string, len(t.Keys), cap(t.Keys))

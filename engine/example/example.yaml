@@ -26,7 +26,7 @@ groups:
 
   - name: req2
     method: GET
-    url: https://reqres.in/api/users/${id}/${date}
+    url: https://reqres.in/api/users/${var.id}/${var.date}
     <<: *headers
     assertions:
       body:
