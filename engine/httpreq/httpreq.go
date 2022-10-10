@@ -1,12 +1,12 @@
 package httpreq
 
 import (
+	as "github.com/swamp-labs/swamp/engine/assertion"
+	ts "github.com/swamp-labs/swamp/engine/templateString"
 	"io"
 	"log"
 	"net/http"
 	"net/http/httptrace"
-
-	as "github.com/swamp-labs/swamp/engine/assertion"
 )
 
 // Request struct defines all parameters for http requests to execute
@@ -15,7 +15,7 @@ type Request struct {
 	Method          string              `yaml:"method"`
 	Protocol        string              `yaml:"protocol"`
 	Headers         []map[string]string `yaml:"headers"`
-	URL             string              `yaml:"url"`
+	URL             ts.TemplateString   `yaml:"url"`
 	Body            string              `yaml:"body"`
 	QueryParameters map[string]string   `yaml:"query_parameters"`
 	Assertions      as.Assertion        `yaml:"assertions"`
@@ -32,7 +32,9 @@ func (r *Request) AddQueryParam(key string, value string) *Request {
 func (r *Request) Execute(m map[string]string) (bool, error) {
 	client := &http.Client{}
 	clientTrace := Trace{}
-	req, _ := http.NewRequest(r.Method, r.URL, nil)
+
+	url, _ := r.URL.ToString(m)
+	req, _ := http.NewRequest(r.Method, url, nil)
 	q := req.URL.Query()
 	if len(r.QueryParameters) > 0 {
 		for key, value := range r.QueryParameters {
