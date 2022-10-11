@@ -1,6 +1,9 @@
 package config
 
-import "gopkg.in/yaml.v3"
+import (
+	"github.com/swamp-labs/swamp/engine/templateString"
+	"gopkg.in/yaml.v3"
+)
 
 // assertionsBlockTemplate defines the yaml template used to represent a request
 // assertions.
@@ -13,16 +16,16 @@ type assertionsBlockTemplate struct {
 	Headers []map[string][]string `yaml:"headers"`
 }
 
-// requestTemplate defines the yam template used to define a request
+// requestTemplate defines the yaml template used to define a request
 type requestTemplate struct {
-	Name            string                  `yaml:"name"`
-	Method          string                  `yaml:"method"`
-	Protocol        string                  `yaml:"protocol"`
-	Headers         []map[string]string     `yaml:"headers"`
-	URL             string                  `yaml:"url"`
-	Body            string                  `yaml:"body"`
-	QueryParameters map[string]string       `yaml:"query_parameters"`
-	Assertions      assertionsBlockTemplate `yaml:"assertions"`
+	Name            string                        `yaml:"name"`
+	Method          string                        `yaml:"method"`
+	Protocol        string                        `yaml:"protocol"`
+	Headers         []map[string]string           `yaml:"headers"`
+	URL             templateString.TemplateString `yaml:"url"`
+	Body            string                        `yaml:"body"`
+	QueryParameters map[string]string             `yaml:"query_parameters"`
+	Assertions      assertionsBlockTemplate       `yaml:"assertions"`
 }
 
 // volumeTemplate defines an execution plan.
