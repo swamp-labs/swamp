@@ -4,47 +4,47 @@ x-headers: &headers
     - Accept: "*/*"
 
 
-groups:
-  g1:
-  - name: req1
-    method: "POST"
-    protocol: https
-    url: https://reqres.in/api/users
-    <<: *headers
-    body: '{ "name": "batman", "job": "superhero"}'
-    assertions:
-      headers:
-      - Access-Control-Allow-Origin: ["*"]
-      - Content-Type: [application/json; charset=utf-8]
-      body:
-      - jsonpath: $.id
-        variable: id
-      - regex: '(\d{4,})'
-        variable: date
-      code:
-        - 201
+tasks:
+  t1:
+    requests:
+    - name: req1
+      method: "POST"
+      protocol: https
+      url: https://reqres.in/api/users
+      <<: *headers
+      body: '{ "name": "batman", "job": "superhero"}'
+      assertions:
+        headers:
+        - Access-Control-Allow-Origin: ["*"]
+        - Content-Type: [application/json; charset=utf-8]
+        body:
+        - jsonpath: $.id
+          variable: id
+        - regex: '(\d{4,})'
+          variable: date
+        code:
+          - 201
 
-  - name: req2
-    method: GET
-    url: https://reqres.in/api/users/${var.id}/${var.date}
-    <<: *headers
-    assertions:
-      body:
-      - jsonpath: $.id
-        variable: id
-
-  g2:
-  - name: req3
-    method: GET
-    url: https://reqres.in/api/users
-    assertions:
-      code:
+    - name: req2
+      method: GET
+      url: https://reqres.in/api/users/${var.id}/${var.date}
+      <<: *headers
+      assertions:
+        body:
+        - jsonpath: $.id
+          variable: id
+    volume:
+    - wait: 1
+    - rps: 10
+      during: 60
+  t2:
+    requests:
+    - name: req3
+      method: GET
+      url: https://reqres.in/api/users
+      assertions:
+        code:
         - 200
-
-volumes:
- - request_group: g1
-#   execution:
-#   - wait: 5
-#   - rps: 5
-#     during: 60s
-#   - increase:
+    volume:
+    - rps: 10
+      during: 60

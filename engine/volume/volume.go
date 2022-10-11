@@ -1,17 +1,13 @@
 package volume
 
-type Volume interface {
-	GetRequestGroup() string
-}
+//type Volume interface {
+//	//GetRequestGroup() string
+//}
 
-type volume struct {
-	requestGroup string
-}
+type Volume []map[string]int
 
-func (v volume) GetRequestGroup() string {
-	return v.requestGroup
-}
+//type action string
 
-func MakeVolume(requestGroup string) Volume {
-	return volume{requestGroup: requestGroup}
-}
+//func MakeVolume(actionsList []map[action]int) Volume {
+//	return volume{actionsList: actionsList}
+//}
