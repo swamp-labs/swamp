@@ -20,12 +20,12 @@ func main() {
 	}
 
 	log.Println(config)
-	groups := config.GetGroups()
+	tasks := config.GetTasks()
 
-	for _, table := range groups {
+	for _, task := range tasks {
 		sessionVar := make(map[string]string)
 
-		for _, r := range table {
+		for _, r := range task.GetRequest() {
 			_, err := r.Execute(sessionVar)
 			if err != nil {
 				log.Println(err)

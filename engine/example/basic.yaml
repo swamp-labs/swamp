@@ -1,0 +1,30 @@
+x-headers: &headers
+  headers:
+    - Content-Type: "application/json"
+    - Accept: "*/*"
+
+
+tasks:
+  t1:
+    requests:
+      - name: req1
+        method: "POST"
+        protocol: https
+        url: https://reqres.in/api/users
+        <<: *headers
+        body: '{ "name": "batman", "job": "superhero"}'
+        assertions:
+          headers:
+            - Access-Control-Allow-Origin: ["*"]
+            - Content-Type: [application/json; charset=utf-8]
+          body:
+            - jsonpath: $.id
+              variable: id
+            - regex: '(\d{4,})'
+              variable: date
+          code:
+            - 201
+    volume:
+      - wait: 1
+      - rps: 10
+        during: 60

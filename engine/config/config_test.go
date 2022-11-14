@@ -4,6 +4,8 @@ import (
 	"github.com/swamp-labs/swamp/engine/assertion"
 	"github.com/swamp-labs/swamp/engine/httpreq"
 	"github.com/swamp-labs/swamp/engine/simulation"
+	"github.com/swamp-labs/swamp/engine/task"
+	"github.com/swamp-labs/swamp/engine/templateString"
 	"github.com/swamp-labs/swamp/engine/volume"
 	"path/filepath"
 	"reflect"
@@ -31,63 +33,35 @@ func TestParse(t *testing.T) {
 	}{
 		{
 			name: "Example file",
-			args: args{filepath.Join(dir, "../example/example.yaml")},
+			args: args{filepath.Join(dir, "../example/basic.yaml")},
 			want: simulation.MakeSimulation(
-				[]volume.Volume{},
-				map[string][]httpreq.Request{
-					"g1": {{
-						Name:     "req1",
-						Method:   "POST",
-						Protocol: "https",
-						Headers: []map[string]string{
-							{ContentTypeHeader: "application/json"},
-							{"Accept": "*/*"},
-						},
-						URL:             "https://reqres.in/api/users",
-						Body:            "{ \"name\": \"batman\", \"job\": \"superhero\"}",
-						QueryParameters: nil,
-						Assertions: assertion.MakeRequestAssertion(
-							[]assertion.BodyAssertion{
-								assertion.NewJsonPathAssertion("$.id", "id"),
-								assertion.NewRegexAssertion("(\\d{4,})", "date"),
-							},
-							[]int{201},
-							[]map[string][]string{
-								{"Access-Control-Allow-Origin": {"*"}},
-								{ContentTypeHeader: {"application/json; charset=utf-8"}},
-							},
-						),
-					},
+				map[string]task.Task{
+					"t1": task.MakeTask([]httpreq.Request{
 						{
-							Name:   "req2",
-							Method: "GET",
+							Name:     "req1",
+							Method:   "POST",
+							Protocol: "https",
 							Headers: []map[string]string{
 								{ContentTypeHeader: "application/json"},
 								{"Accept": "*/*"},
 							},
-							URL:             "https://reqres.in/api/users/${id}",
+							URL:             templateString.TemplateString{Format: "https://reqres.in/api/users"},
+							Body:            "{ \"name\": \"batman\", \"job\": \"superhero\"}",
 							QueryParameters: nil,
 							Assertions: assertion.MakeRequestAssertion(
 								[]assertion.BodyAssertion{
 									assertion.NewJsonPathAssertion("$.id", "id"),
+									assertion.NewRegexAssertion("(\\d{4,})", "date"),
 								},
-								nil,
-								nil,
+								[]int{201},
+								[]map[string][]string{
+									{"Access-Control-Allow-Origin": {"*"}},
+									{ContentTypeHeader: {"application/json; charset=utf-8"}},
+								},
 							),
 						},
 					},
-					"g2": {{
-						Name:            "req3",
-						Method:          "GET",
-						Headers:         nil,
-						URL:             "https://reqres.in/api/users",
-						QueryParameters: nil,
-						Assertions: assertion.MakeRequestAssertion(
-							[]assertion.BodyAssertion{},
-							[]int{200},
-							nil,
-						),
-					}},
+						volume.Volume{{"wait": 1}, {"rps": 10, "during": 60}}),
 				},
 			),
 			wantErr: false,
@@ -100,8 +74,8 @@ func TestParse(t *testing.T) {
 				t.Errorf("Parse() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got.GetGroups(), tt.want.GetGroups()) {
-				t.Errorf("Parse() got = %v, want %v", got.GetGroups(), tt.want.GetGroups())
+			if !reflect.DeepEqual(got.GetTasks(), tt.want.GetTasks()) {
+				t.Errorf("Parse() got = %v, want %v", got.GetTasks(), tt.want.GetTasks())
 			}
 		})
 	}
