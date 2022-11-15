@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	cnf "github.com/swamp-labs/swamp/engine/config"
 	"github.com/swamp-labs/swamp/engine/logger"
 	"os"
@@ -20,16 +21,16 @@ func main() {
 		os.Exit(3)
 	}
 
-	//logger.EngineLogger.Info(config)
-	groups := config.GetGroups()
+	logger.Engine.Info(fmt.Sprintf("%+v", config))
+	tasks := config.GetTasks()
 
-	for _, table := range groups {
+	for _, task := range tasks {
 		sessionVar := make(map[string]string)
 
-		for _, r := range table {
+		for _, r := range task.GetRequest() {
 			_, err := r.Execute(sessionVar)
 			if err != nil {
-				//logger.EngineLogger.Info(err)
+				logger.Engine.Info(err.Error())
 			}
 		}
 	}

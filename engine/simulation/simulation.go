@@ -1,31 +1,23 @@
 package simulation
 
 import (
-	"github.com/swamp-labs/swamp/engine/httpreq"
-	"github.com/swamp-labs/swamp/engine/volume"
+	"github.com/swamp-labs/swamp/engine/task"
 )
 
 type Simulation interface {
-	GetVolumes() []volume.Volume
-	GetGroups() map[string][]httpreq.Request
+	GetTasks() map[string]task.Task
 }
 
 type simulation struct {
-	volumes []volume.Volume
-	groups  map[string][]httpreq.Request
+	tasks map[string]task.Task
 }
 
-func (s simulation) GetVolumes() []volume.Volume {
-	return s.volumes
+func (s simulation) GetTasks() map[string]task.Task {
+	return s.tasks
 }
 
-func (s simulation) GetGroups() map[string][]httpreq.Request {
-	return s.groups
-}
-
-func MakeSimulation(volumes []volume.Volume, groups map[string][]httpreq.Request) Simulation {
+func MakeSimulation(tasks map[string]task.Task) Simulation {
 	return simulation{
-		volumes: volumes,
-		groups:  groups,
+		tasks: tasks,
 	}
 }

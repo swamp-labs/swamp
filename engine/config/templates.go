@@ -28,14 +28,15 @@ type requestTemplate struct {
 	Assertions      assertionsBlockTemplate       `yaml:"assertions"`
 }
 
-// volumeTemplate defines an execution plan.
-type volumeTemplate struct {
-	RequestGroup string `yaml:"request_group"`
-	//	Execution    []string `yaml:"execution"`
-}
-
 // simulationTemplate wraps configuration file content
 type simulationTemplate struct {
-	Groups  map[string][]requestTemplate `yaml:"groups"`
-	Volumes []volumeTemplate             `yaml:"volume"`
+	Tasks map[string]taskTemplate `yaml:"tasks"`
+}
+
+// taskTemplate defines a list of actions to execute, can be compared to a user scenario
+type taskTemplate struct {
+	// Requests lists to http request to execute in plan
+	Requests []requestTemplate `yaml:"requests"`
+	// Volume defines an execution plan.
+	Volume []map[string]int `yaml:"volume"`
 }
