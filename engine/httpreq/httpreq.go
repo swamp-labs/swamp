@@ -3,8 +3,6 @@ package httpreq
 import (
 	as "github.com/swamp-labs/swamp/engine/assertion"
 	ts "github.com/swamp-labs/swamp/engine/templateString"
-	"io"
-	"log"
 	"net/http"
 	"net/http/httptrace"
 )
@@ -58,24 +56,4 @@ func (r *Request) Execute(m map[string]string) (bool, error) {
 	r.displayResult(resp, m, v, s)
 
 	return v, nil
-}
-
-func (r *Request) displayResult(resp *http.Response, m map[string]string, b bool, s *Sample) {
-	body, _ := io.ReadAll(resp.Body)
-	log.Println("#######################################")
-	log.Println("--------------- Request ---------------")
-	log.Println("Request name :", r.Name)
-	log.Println("Target :", r.Method, r.URL)
-	log.Println("---------------------------------------")
-	log.Println("--------------- Response --------------")
-	log.Println("Response code :", resp.StatusCode)
-	log.Println("Response body :", string(body))
-	log.Println("---------------------------------------")
-	log.Println("---------- Assertions Result ----------")
-	log.Println("Global validation :", b)
-	log.Println("Returned variables :", m)
-	log.Println("***************************************")
-	log.Println("************ Request traces ***********")
-	s.displayTrace()
-	log.Println("#######################################")
 }

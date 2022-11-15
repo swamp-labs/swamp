@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	cnf "github.com/swamp-labs/swamp/engine/config"
-	"log"
+	"github.com/swamp-labs/swamp/engine/logger"
 	"os"
 )
 
@@ -16,10 +16,11 @@ func main() {
 	flag.Parse()
 	config, err := cnf.Parse(*configFile)
 	if err != nil {
-		log.Fatal("Error while reading YAML file: ", err)
+		logger.Engine.Error("Error while reading YAML file: ", err)
+		os.Exit(3)
 	}
 
-	log.Println(config)
+	//logger.EngineLogger.Info(config)
 	groups := config.GetGroups()
 
 	for _, table := range groups {
@@ -28,7 +29,7 @@ func main() {
 		for _, r := range table {
 			_, err := r.Execute(sessionVar)
 			if err != nil {
-				log.Println(err)
+				//logger.EngineLogger.Info(err)
 			}
 		}
 	}
