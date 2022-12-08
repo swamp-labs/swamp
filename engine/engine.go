@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	cnf "github.com/swamp-labs/swamp/engine/config"
-	"log"
+	"github.com/swamp-labs/swamp/engine/logger"
 	"os"
 )
 
@@ -16,10 +17,11 @@ func main() {
 	flag.Parse()
 	config, err := cnf.Parse(*configFile)
 	if err != nil {
-		log.Fatal("Error while reading YAML file: ", err)
+		logger.Engine.Error("Error while reading YAML file: ", err)
+		os.Exit(3)
 	}
 
-	log.Println(config)
+	logger.Engine.Info(fmt.Sprintf("%+v", config))
 	tasks := config.GetTasks()
 
 	for _, task := range tasks {
@@ -28,7 +30,7 @@ func main() {
 		for _, r := range task.GetRequest() {
 			_, err := r.Execute(sessionVar)
 			if err != nil {
-				log.Println(err)
+				logger.Engine.Info(err.Error())
 			}
 		}
 	}

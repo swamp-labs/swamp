@@ -2,7 +2,6 @@ package httpreq
 
 import (
 	"crypto/tls"
-	"log"
 	"net"
 	"net/http/httptrace"
 	"sync/atomic"
@@ -29,16 +28,6 @@ type Sample struct {
 	// Detailed connection information.
 	ConnReused     bool
 	ConnRemoteAddr net.Addr
-}
-
-func (s *Sample) displayTrace() {
-	log.Println("DNS resolution duration :", s.DNSDuration)
-	log.Println("TLS Handshaking :", s.TLSHandshaking)
-	log.Println("Connection duration :", s.ConnDuration)
-	log.Println("Request duration :", s.ReqDuration)
-	log.Println("Sending (writing request) :", s.Sending)
-	log.Println("Waiting response :", s.WaitingResp)
-	log.Println("Receiving response :", s.Receiving)
 }
 
 // A Trace represents detailed information about a http request. Info are returned using
@@ -90,7 +79,7 @@ func (t *Trace) GetConn(hostPort string) {
 // If net.Dialer.DualStack (IPv6 "Happy Eyeballs") support is
 // enabled, this may be called multiple times.
 func (t *Trace) ConnectStart(network, addr string) {
-	// CompareAndSwapInt64 ensures the only the first connectStart is used
+	// CompareAndSwapInt64 ensures only the first connectStart is used
 	// if the func is called multiple times
 	atomic.CompareAndSwapInt64(&t.connectStart, 0, now())
 
