@@ -23,7 +23,7 @@ type requestTemplate struct {
 	Protocol        string                        `yaml:"protocol"`
 	Headers         []map[string]string           `yaml:"headers"`
 	URL             templateString.TemplateString `yaml:"url"`
-	Body            string                        `yaml:"body"`
+	Body            templateString.TemplateString `yaml:"body"`
 	QueryParameters map[string]string             `yaml:"query_parameters"`
 	Assertions      assertionsBlockTemplate       `yaml:"assertions"`
 }

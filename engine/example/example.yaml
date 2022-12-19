@@ -12,7 +12,7 @@ tasks:
       protocol: https
       url: https://reqres.in/api/users
       <<: *headers
-      body: '{ "name": "batman", "job": "superhero"}'
+      body: '${file:example/body.xml}'
       assertions:
         headers:
         - Access-Control-Allow-Origin: ["*"]
