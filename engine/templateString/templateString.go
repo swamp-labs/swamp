@@ -3,10 +3,12 @@ package templateString
 import (
 	"fmt"
 	"gopkg.in/yaml.v3"
+	"os"
 	"regexp"
 )
 
 const templateStringExpressionRegex string = `\${var\.((\w)+)}`
+const bodyFileTemplateExpressionRegex string = `\${file:(.+)}`
 
 type TemplateString struct {
 	Format string   // Should be something like https://swamp.com/%s/%s from URL https://swamp.com/${id}/${simulation}
@@ -15,9 +17,15 @@ type TemplateString struct {
 
 // UnmarshalYAML decodes a yaml node to convert it into a template string
 func (t *TemplateString) UnmarshalYAML(node *yaml.Node) error {
-	re, _ := regexp.Compile(templateStringExpressionRegex)
+	value := node.Value
+	re, _ := regexp.Compile(bodyFileTemplateExpressionRegex)
+	if re.MatchString(value) {
+		filename := re.FindAllStringSubmatch(node.Value, -1)
+		value = readBody(filename[0][1])
+	}
 
-	matches := re.FindAllStringSubmatch(node.Value, -1)
+	re, _ = regexp.Compile(templateStringExpressionRegex)
+	matches := re.FindAllStringSubmatch(value, -1)
 	t.Keys = make([]string, len(matches), cap(matches))
 
 	for i, match := range matches {
@@ -29,7 +37,7 @@ func (t *TemplateString) UnmarshalYAML(node *yaml.Node) error {
 	if len(matches) == 0 {
 		t.Keys = nil
 	}
-	t.Format = re.ReplaceAllString(node.Value, "%s")
+	t.Format = re.ReplaceAllString(value, "%s")
 	return nil
 }
 
@@ -53,4 +61,13 @@ func toInterface(list []string) []interface{} {
 		values[i] = v
 	}
 	return values
+}
+
+func readBody(filename string) string {
+	byteValue, err := os.ReadFile(filename)
+	if err != nil {
+		return err.Error()
+	}
+	body := string(byteValue)
+	return body
 }

@@ -5,6 +5,7 @@ import (
 	ts "github.com/swamp-labs/swamp/engine/templateString"
 	"net/http"
 	"net/http/httptrace"
+	"strings"
 )
 
 // Request struct defines all parameters for http requests to execute
@@ -14,7 +15,7 @@ type Request struct {
 	Protocol        string              `yaml:"protocol"`
 	Headers         []map[string]string `yaml:"headers"`
 	URL             ts.TemplateString   `yaml:"url"`
-	Body            string              `yaml:"body"`
+	Body            ts.TemplateString   `yaml:"body"`
 	QueryParameters map[string]string   `yaml:"query_parameters"`
 	Assertions      as.Assertion        `yaml:"assertions"`
 }
@@ -32,7 +33,8 @@ func (r *Request) Execute(m map[string]string) (bool, error) {
 	clientTrace := Trace{}
 
 	url, _ := r.URL.ToString(m)
-	req, _ := http.NewRequest(r.Method, url, nil)
+	body, _ := r.Body.ToString(m)
+	req, _ := http.NewRequest(r.Method, url, strings.NewReader(body))
 	q := req.URL.Query()
 	if len(r.QueryParameters) > 0 {
 		for key, value := range r.QueryParameters {

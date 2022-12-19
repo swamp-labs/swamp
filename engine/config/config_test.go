@@ -46,7 +46,7 @@ func TestParse(t *testing.T) {
 								{"Accept": "*/*"},
 							},
 							URL:             templateString.TemplateString{Format: "https://reqres.in/api/users"},
-							Body:            "{ \"name\": \"batman\", \"job\": \"superhero\"}",
+							Body:            templateString.TemplateString{Format: "{ \"name\": \"batman\", \"job\": \"superhero\"}"},
 							QueryParameters: nil,
 							Assertions: assertion.MakeRequestAssertion(
 								[]assertion.BodyAssertion{
