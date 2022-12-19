@@ -13,8 +13,6 @@ func (requestTemplate requestTemplate) decode() (*httpreq.Request, error) {
 	if err != nil {
 		return nil, err
 	}
-	//	body, err := requestTemplate.Body.decode()
-
 	return &httpreq.Request{
 		Name:            requestTemplate.Name,
 		Method:          requestTemplate.Method,
