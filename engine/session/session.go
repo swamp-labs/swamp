@@ -8,9 +8,7 @@ import (
 type DataSource[T interface{}] interface {
 	GetNextSessionData() T
 }
-type SessionExecutionTrace struct {
-	//	Traces map[string]httpreq.Trace
-}
+type ExecutionTraces struct{}
 
 type Session struct {
 	Id           uuid.UUID
@@ -24,5 +22,5 @@ func (s *Session) New() {
 }
 
 func (s *Session) GetContext() {
-
+	//To be implemented to get context from previous dependency task
 }

@@ -54,7 +54,7 @@ func (d decrease) Inject(fct timedFunctions.TickedFunction) {
 }
 
 func (i instant) Inject(_ timedFunctions.TickedFunction) {
-
+	//To be implemented with an instant function
 }
 
 func NewWaitVolume(duration time.Duration) Volume {
