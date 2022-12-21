@@ -22,16 +22,7 @@ func main() {
 	}
 
 	logger.Engine.Info(fmt.Sprintf("%+v", config))
-	tasks := config.GetTasks()
+	config.Run()
+	//_ := config.GetTasks()
 
-	for _, task := range tasks {
-		sessionVar := make(map[string]string)
-
-		for _, r := range task.GetRequest() {
-			_, err := r.Execute(sessionVar)
-			if err != nil {
-				logger.Engine.Info(err.Error())
-			}
-		}
-	}
 }

@@ -38,5 +38,5 @@ type taskTemplate struct {
 	// Requests lists to http request to execute in plan
 	Requests []requestTemplate `yaml:"requests"`
 	// Volume defines an execution plan.
-	Volume []map[string]int `yaml:"volume"`
+	Volume []yaml.Node `yaml:"volume"`
 }

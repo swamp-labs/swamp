@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/PaesslerAG/jsonpath v0.1.1
 	github.com/go-playground/validator/v10 v10.11.0
+	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-hclog v1.3.1
 	gopkg.in/yaml.v3 v3.0.1
 )

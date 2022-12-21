@@ -27,25 +27,34 @@ func (requestTemplate requestTemplate) decode() (*httpreq.Request, error) {
 }
 
 func (t taskTemplate) decode() (task.Task, error) {
-	v, err := parseVolume(t.Volume)
-	if err != nil {
-		return nil, err
+	volumes := make([]volume.Volume, cap(t.Volume), len(t.Volume))
+
+	for i, node := range t.Volume {
+		v, err := yamlNodeToVolume(node)
+		if err != nil {
+			return nil, fmt.Errorf("fail to parse volume : %v", err)
+		}
+		volumes[i] = v
 	}
+
 	requests, err := parseRequests(t.Requests)
 	if err != nil {
 		return nil, err
 	}
-	return task.MakeTask(requests, v), nil
+	return task.MakeTask(requests, volumes), nil
 }
 
-func parseVolume(volumeTemplate []map[string]int) (volume.Volume, error) {
-	volumes := make([]map[string]int, cap(volumeTemplate), len(volumeTemplate))
-
-	for volumeId, v := range volumeTemplate {
-		volumes[volumeId] = v
-	}
-	return volumes, nil
-}
+//func parseVolume(volumeBlock []volumeTemplate) ([]volume.Volume, error) {
+//	volumes := make([]map[string]int, cap(volumeTemplate), len(volumeTemplate))
+//
+//	for volumeId, v := range volumeBlock {
+//		volumes, err := v.decode()
+//		if err != nil {
+//			return nil, err
+//		}
+//	}
+//	return volumes, nil
+//}
 
 func parseRequests(requestsTemplate []requestTemplate) ([]httpreq.Request, error) {
 	requests := make([]httpreq.Request, cap(requestsTemplate), len(requestsTemplate))

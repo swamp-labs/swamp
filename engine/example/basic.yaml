@@ -26,5 +26,5 @@ tasks:
             - 201
     volume:
       - wait: 1
-      - rps: 10
-        during: 60
+      - constantUserPerSec: 10
+        during: 60s

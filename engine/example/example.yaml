@@ -35,8 +35,8 @@ tasks:
           variable: id
     volume:
     - wait: 1
-    - rps: 10
-      during: 60
+    - constantUserPerSec: 10
+      during: 60s
   t2:
     requests:
     - name: req3
@@ -46,5 +46,5 @@ tasks:
         code:
         - 200
     volume:
-    - rps: 10
-      during: 60
+    - constantUserPerSec: 10
+      during: 60s

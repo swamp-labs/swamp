@@ -27,7 +27,7 @@ func (r *Request) AddQueryParam(key string, value string) *Request {
 
 // Execute send the http request using client trace
 // and call AssertResponse function to validate the response
-func (r *Request) Execute(m map[string]string) (bool, error) {
+func (r *Request) Execute(m map[string]string) Sample {
 	client := &http.Client{}
 	clientTrace := Trace{}
 
@@ -43,17 +43,17 @@ func (r *Request) Execute(m map[string]string) (bool, error) {
 	clientTraceCtx := httptrace.WithClientTrace(req.Context(), clientTrace.Trace())
 	req = req.WithContext(clientTraceCtx)
 	req.URL.RawQuery = q.Encode()
-	resp, err := client.Do(req)
-	if err != nil {
-		return false, err
-	}
+	resp, _ := client.Do(req)
+	//if err != nil {
+	//	return
+	//}
 	defer resp.Body.Close()
 	s := clientTrace.Done()
-	v, err := r.Assertions.AssertResponse(resp, m)
-	if err != nil {
-		return false, err
-	}
+	v, _ := r.Assertions.AssertResponse(resp, m)
+	//if err != nil {
+	//	return clientTrace
+	//}
 	r.displayResult(resp, m, v, s)
 
-	return v, nil
+	return *s
 }
