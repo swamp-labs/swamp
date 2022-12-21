@@ -10,24 +10,24 @@ import (
 
 type Task interface {
 	GetRequest() []httpreq.Request
-	GetVolume() volume.Volume
+	GetVolume() []volume.Volume
 	Execute(ch chan map[string][]httpreq.Sample)
 }
 
 type task struct {
 	requests []httpreq.Request
-	volume   volume.Volume
+	volume   []volume.Volume
 }
 
 func (t task) GetRequest() []httpreq.Request {
 	return t.requests
 }
 
-func (t task) GetVolume() volume.Volume {
+func (t task) GetVolume() []volume.Volume {
 	return t.volume
 }
 
-func MakeTask(requests []httpreq.Request, volume volume.Volume) Task {
+func MakeTask(requests []httpreq.Request, volume []volume.Volume) Task {
 	return task{
 		requests: requests,
 		volume:   volume,
